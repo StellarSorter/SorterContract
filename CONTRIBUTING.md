@@ -1,6 +1,6 @@
-# Contributing to HireSettle Contract
+# Contributing to StellarSorter Contract
 
-Thank you for your interest in contributing to the HireSettle contract! This repository runs a bounty-style "Stellar Wave" program — we welcome contributions from the community.
+Thank you for your interest in contributing to the StellarSorter contract! This repository runs a bounty-style "Stellar Wave" program — we welcome contributions from the community.
 
 This guide documents the local development workflow, testing procedures, and pull request (PR) process so new contributors can get started quickly without reverse-engineering from the README.
 
@@ -30,7 +30,7 @@ By participating in this project, you agree to treat all contributors with respe
 
 ## Getting Help
 
-If you have questions about the contract, its design, or how to implement a feature, open a GitHub issue and tag the maintainers. For security concerns, see [SECURITY.md](file:///c:/Users/USER/downloads/drips/hiresettle-contract/SECURITY.md).
+If you have questions about the contract, its design, or how to implement a feature, open a GitHub issue and tag the maintainers. For security concerns, see [SECURITY.md](file:///c:/Users/USER/downloads/drips/stellarsorter-contract/SECURITY.md).
 
 ---
 
@@ -61,14 +61,14 @@ rustup target add wasm32v1-none
 Fork the repo on GitHub, then clone your fork locally:
 
 ```bash
-git clone https://github.com/<your-username>/hiresettle-contract.git
-cd hiresettle-contract
+git clone https://github.com/<your-username>/stellarsorter-contract.git
+cd stellarsorter-contract
 ```
 
 Add the upstream remote to keep your fork in sync:
 
 ```bash
-git remote add upstream https://github.com/TrustHire/hiresettle-contract.git
+git remote add upstream https://github.com/TrustHire/stellarsorter-contract.git
 ```
 
 ### 2. Navigate to the Contract Crate
@@ -76,7 +76,7 @@ git remote add upstream https://github.com/TrustHire/hiresettle-contract.git
 The contract code lives in a sub-crate:
 
 ```bash
-cd contracts/hiresettle
+cd contracts/stellarsorter
 ```
 
 ### 3. Verify Your Setup
@@ -101,7 +101,7 @@ The project uses `cargo test` with the Soroban SDK's `testutils` feature enabled
 
 ### Run the Full Test Suite
 
-From the contract directory (`contracts/hiresettle`):
+From the contract directory (`contracts/stellarsorter`):
 
 ```bash
 cargo test
@@ -116,7 +116,7 @@ make test
 From the workspace root, you can also run:
 
 ```bash
-cargo test -p hiresettle
+cargo test -p stellarsorter
 ```
 
 ### Run a Specific Test
@@ -131,7 +131,7 @@ cargo test <test_name_or_pattern>
 
 Tests cover creation, proof submission, confirmation, disputes, arbiter voting, replacement flow, early exit, amendments, batch confirmations, auto-confirm, expiry, admin configuration, and edge cases for all validation rules.
 
-When adding a new feature or fixing a bug, include corresponding test cases in [test.rs](file:///c:/Users/USER/downloads/drips/hiresettle-contract/contracts/hiresettle/src/test.rs).
+When adding a new feature or fixing a bug, include corresponding test cases in [test.rs](file:///c:/Users/USER/downloads/drips/stellarsorter-contract/contracts/stellarsorter/src/test.rs).
 
 ---
 
@@ -193,7 +193,7 @@ For deployment, build and optimize the WASM binary using the Stellar CLI:
 
 ```bash
 stellar contract build
-stellar contract optimize --wasm target/wasm32v1-none/release/hiresettle.wasm
+stellar contract optimize --wasm target/wasm32v1-none/release/stellarsorter.wasm
 ```
 
 Or via Makefile:
@@ -205,7 +205,7 @@ make optimize
 The optimized WASM will be at:
 
 ```
-target/wasm32v1-none/release/hiresettle.optimized.wasm
+target/wasm32v1-none/release/stellarsorter.optimized.wasm
 ```
 
 ---
@@ -237,7 +237,7 @@ Use descriptive branch names like `feature/batch-confirm-sequential-fix` or `fix
 
 Before opening a PR, **locally run all three**:
 
-| Step | Command (from `contracts/hiresettle`) |
+| Step | Command (from `contracts/stellarsorter`) |
 |------|----------------------------------------|
 | ✅ Format | `cargo fmt` |
 | ✅ Lint   | `cargo clippy -- -D warnings` |
@@ -253,7 +253,7 @@ Push your branch to your fork:
 git push origin feature/<descriptive-name>
 ```
 
-Then open a PR on GitHub against `TrustHire/hiresettle-contract:main`.
+Then open a PR on GitHub against `TrustHire/stellarsorter-contract:main`.
 
 #### PR Template Checklist
 
@@ -298,10 +298,10 @@ If a CI check fails, click through to the run log, diagnose the issue, and push 
 
 ## Security
 
-For security vulnerabilities, **do not open a public issue**. Follow the responsible disclosure process documented in [SECURITY.md](file:///c:/Users/USER/downloads/drips/hiresettle-contract/SECURITY.md).
+For security vulnerabilities, **do not open a public issue**. Follow the responsible disclosure process documented in [SECURITY.md](file:///c:/Users/USER/downloads/drips/stellarsorter-contract/SECURITY.md).
 
 ---
 
 ## License
 
-By contributing to this repository, you agree that your contributions will be licensed under the MIT License, as specified in [LICENSE](file:///c:/Users/USER/downloads/drips/hiresettle-contract/LICENSE).
+By contributing to this repository, you agree that your contributions will be licensed under the MIT License, as specified in [LICENSE](file:///c:/Users/USER/downloads/drips/stellarsorter-contract/LICENSE).

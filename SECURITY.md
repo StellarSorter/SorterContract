@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-We take security vulnerabilities in the hiresettle smart contract seriously. If you discover a vulnerability, please report it responsibly using one of the following methods:
+We take security vulnerabilities in the stellarsorter smart contract seriously. If you discover a vulnerability, please report it responsibly using one of the following methods:
 
 ### Private Reporting Options
 
@@ -13,7 +13,7 @@ We take security vulnerabilities in the hiresettle smart contract seriously. If 
    - This creates a private advisory for our team
 
 2. **Email**
-   - Send details to: [security@hiresettle.dev](mailto:security@hiresettle.dev)
+   - Send details to: [security@stellarsorter.dev](mailto:security@stellarsorter.dev)
    - Include a description of the vulnerability, affected versions, and potential impact
    - Do not publicly disclose details until we've had time to address the issue
 
@@ -44,7 +44,7 @@ Only the main branch receives active security updates. We recommend using the la
 ## Scope
 
 This policy applies to vulnerabilities in:
-- Smart contract code (within `contracts/hiresettle/src/`)
+- Smart contract code (within `contracts/stellarsorter/src/`)
 - Contract-related dependencies as defined in `Cargo.toml`
 
 This policy does NOT apply to:
