@@ -1,8 +1,8 @@
-# HireSettle — Recruitment Fee Settlement Contract
+# StellarSorter — Recruitment Fee Settlement Contract
 
-[![Test Status](https://github.com/TrustHire/hiresettle-contract/actions/workflows/test.yml/badge.svg)](https://github.com/TrustHire/hiresettle-contract/actions/workflows/test.yml)
+[![Test Status](https://github.com/TrustHire/stellarsorter-contract/actions/workflows/test.yml/badge.svg)](https://github.com/TrustHire/stellarsorter-contract/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](contracts/hiresettle/Cargo.toml)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](contracts/stellarsorter/Cargo.toml)
 
 A [Soroban](https://soroban.stellar.org/) smart contract deployed on Stellar for managing recruitment fee settlements through milestone-based escrow payments. Built with `#![no_std]` Rust and the Soroban SDK.
 
@@ -23,14 +23,14 @@ Before getting started, ensure you have:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/TrustHire/hiresettle-contract.git
-cd hiresettle-contract
+git clone https://github.com/TrustHire/stellarsorter-contract.git
+cd stellarsorter-contract
 ```
 
 ### Build the Contract
 
 ```bash
-cd contracts/hiresettle
+cd contracts/stellarsorter
 cargo build
 ```
 
@@ -49,14 +49,14 @@ This is equivalent to the Stellar CLI invocation used in CI and the Makefile:
 stellar contract build
 ```
 
-The resulting WASM binary is emitted at `target/wasm32v1-none/release/hiresettle.wasm`. To optimize it for deployment:
+The resulting WASM binary is emitted at `target/wasm32v1-none/release/stellarsorter.wasm`. To optimize it for deployment:
 
 ```bash
-stellar contract optimize --wasm target/wasm32v1-none/release/hiresettle.wasm
+stellar contract optimize --wasm target/wasm32v1-none/release/stellarsorter.wasm
 # or simply: make optimize
 ```
 
-The optimized artifact is `target/wasm32v1-none/release/hiresettle.optimized.wasm`.
+The optimized artifact is `target/wasm32v1-none/release/stellarsorter.optimized.wasm`.
 
 Because Soroban runs contracts inside the Stellar WASM VM, the contract must compile to a freestanding WASM binary with no reliance on the host OS — hence the crate is annotated `#![no_std]` and built with the `wasm32v1-none` target, which ships no standard library and no OS interface. By contrast, `cargo build` and `cargo test` (the host-target commands above) compile natively so the tests can run in a normal process with the Soroban host emulated by the SDK.
 
@@ -82,15 +82,15 @@ It uses four roles, each with its own key:
 | `arbiter`   | Named on the engagement; only acts if a dispute is raised |
 
 > **Want to see the whole flow in seconds instead of a day?** The same lifecycle, with three milestones and simulated ledger time, runs as a unit test:
-> `cd contracts/hiresettle && cargo test test_full_engagement_lifecycle -- --nocapture`
-> (see `test_full_engagement_lifecycle` in [`src/test.rs`](contracts/hiresettle/src/test.rs)).
+> `cd contracts/stellarsorter && cargo test test_full_engagement_lifecycle -- --nocapture`
+> (see `test_full_engagement_lifecycle` in [`src/test.rs`](contracts/stellarsorter/src/test.rs)).
 
 ### Step 0 — Build the WASM
 
-Complete [Setup & Installation](#setup--installation) first, then build the optimized artifact from `contracts/hiresettle`:
+Complete [Setup & Installation](#setup--installation) first, then build the optimized artifact from `contracts/stellarsorter`:
 
 ```bash
-cd contracts/hiresettle
+cd contracts/stellarsorter
 make optimize
 ```
 
@@ -113,7 +113,7 @@ Friendbot gives each account 10,000 XLM, which is plenty for the escrow and fees
 
 ```bash
 CONTRACT=$(stellar contract deploy \
-  --wasm target/wasm32v1-none/release/hiresettle.optimized.wasm \
+  --wasm target/wasm32v1-none/release/stellarsorter.optimized.wasm \
   --source admin --network testnet)
 
 stellar contract invoke --id "$CONTRACT" --source admin --network testnet \
@@ -402,7 +402,7 @@ flowchart TD
 - **Quorum**: The minimum threshold of votes or signatures required to execute a governance or arbitration action.
 - **Amendment**: A formal modification proposed and agreed upon to update the terms of an active engagement.
 
-HireSettle governs the relationship between a **hiring company** and a **recruiter** by locking the total agreed fee in an escrow wallet at engagement creation. As the recruiter delivers on each milestone (placement, 30-day retention, 90-day retention, etc.), the company confirms the deliverable, releasing a proportional payment from escrow. If disputes arise, an M-of-N arbiter panel votes to resolve them. The contract handles the entire lifecycle: creation, proof submission, confirmation, dispute, replacement, early exit, cancellation, and expiry.
+StellarSorter governs the relationship between a **hiring company** and a **recruiter** by locking the total agreed fee in an escrow wallet at engagement creation. As the recruiter delivers on each milestone (placement, 30-day retention, 90-day retention, etc.), the company confirms the deliverable, releasing a proportional payment from escrow. If disputes arise, an M-of-N arbiter panel votes to resolve them. The contract handles the entire lifecycle: creation, proof submission, confirmation, dispute, replacement, early exit, cancellation, and expiry.
 
 ### Core Concepts
 
@@ -868,7 +868,7 @@ Events: one `("platform_fee_collected", engagement_id)` per treasury, in list or
 ### `DataKey`
 
 Contract storage is keyed by three `#[contracttype]` enums, all defined in
-`contracts/hiresettle/src/enums.rs`. Soroban caps a contract-type union at 50
+`contracts/stellarsorter/src/enums.rs`. Soroban caps a contract-type union at 50
 variants, so `DataKey` holds the original keys, admin-tunable scalars are
 nested under `DataKey::Config(ConfigKey)`, and newer features use `DataKey2`.
 
@@ -1673,7 +1673,7 @@ See [Cosigners](#cosigners) for the full authorization-delegation flow.
 
 #### Arbiter Voting
 
-HireSettle uses a **multi-arbiter M-of-N voting model** to resolve disputes. When a company raises a dispute on a milestone, each assigned arbiter may cast a single vote using `cast_arbiter_vote()`.
+StellarSorter uses a **multi-arbiter M-of-N voting model** to resolve disputes. When a company raises a dispute on a milestone, each assigned arbiter may cast a single vote using `cast_arbiter_vote()`.
 
 Votes are tracked until one of the following conditions is met:
 
@@ -1698,7 +1698,7 @@ This read-only function returns the current approval and rejection vote counts w
 
 #### Arbiter Succession
 
-To support long-running engagements, HireSettle allows arbiters to transfer their responsibilities to a successor without modifying the engagement itself.
+To support long-running engagements, StellarSorter allows arbiters to transfer their responsibilities to a successor without modifying the engagement itself.
 
 The succession process consists of two steps:
 
@@ -2139,13 +2139,13 @@ than only in RPC access logs.
 
 ### Milestone Confirmation Functions
 
-HireSettle provides three milestone confirmation paths with different authorization, preconditions, and semantics. The canonical single-milestone `confirm_milestone` is documented here as a reference point so the two batch / force variants can be contrasted against it.
+StellarSorter provides three milestone confirmation paths with different authorization, preconditions, and semantics. The canonical single-milestone `confirm_milestone` is documented here as a reference point so the two batch / force variants can be contrasted against it.
 
 ---
 
 #### `confirm_milestone` — Single Milestone (Reference)
 
-Contract function reference: [confirm_milestone](file:///C:/Users/Shepherd/projects/hiresettle-contract/contracts/hiresettle/src/lib.rs#L1169-L1286)
+Contract function reference: [confirm_milestone](file:///C:/Users/Shepherd/projects/stellarsorter-contract/contracts/stellarsorter/src/lib.rs#L1169-L1286)
 
 **Caller**: The engagement's `company` address. Requires authentication (`company.require_auth()`).
 
@@ -2169,7 +2169,7 @@ Contract function reference: [confirm_milestone](file:///C:/Users/Shepherd/proje
 
 #### `batch_confirm_milestones` — Atomic Multi-Milestone Confirmation
 
-Contract function reference: [batch_confirm_milestones](file:///C:/Users/Shepherd/projects/hiresettle-contract/contracts/hiresettle/src/lib.rs#L3195-L3332)
+Contract function reference: [batch_confirm_milestones](file:///C:/Users/Shepherd/projects/stellarsorter-contract/contracts/stellarsorter/src/lib.rs#L3195-L3332)
 
 Confirms several milestones in one transaction with a single company signature and all-or-nothing semantics. Useful when a batch of milestones (e.g. placement + 30-day retention) have proof submitted and the company wants to release them together.
 
@@ -2206,7 +2206,7 @@ Confirms several milestones in one transaction with a single company signature a
 
 #### `force_confirm_milestone` — Confirm-Window Timeout Override
 
-Contract function reference: [force_confirm_milestone](file:///C:/Users/Shepherd/projects/hiresettle-contract/contracts/hiresettle/src/lib.rs#L3404-L3519)
+Contract function reference: [force_confirm_milestone](file:///C:/Users/Shepherd/projects/stellarsorter-contract/contracts/stellarsorter/src/lib.rs#L3404-L3519)
 
 A permissionless keeper function that force-confirms a milestone whose proof was submitted but the company never acted on it within the configured confirm window. This is the "auto-confirm" safety net advertised in the feature table: it guarantees the recruiter eventually gets paid if the deliverable is not disputed, even if the company goes silent.
 
@@ -2229,8 +2229,8 @@ A permissionless keeper function that force-confirms a milestone whose proof was
 
 The confirm window is a global admin-configured ledger delta stored under `DataKey::ConfirmWindow`. It is managed by two admin/read functions:
 
-- [set_confirm_window](file:///C:/Users/Shepherd/projects/hiresettle-contract/contracts/hiresettle/src/lib.rs#L3355-L3362) — `set_confirm_window(env, admin, ledgers)`. Admin only. Sets the confirm-window ledger delta and emits `confirm_window_set`.
-- [get_confirm_window](file:///C:/Users/Shepherd/projects/hiresettle-contract/contracts/hiresettle/src/lib.rs#L3365-L3370) — `get_confirm_window(env) -> u32`. Read-only. Returns the active window; defaults to `DEFAULT_CONFIRM_WINDOW_LEDGERS = 86_400` (≈ 5 calendar days at 5 s / ledger) if admin has never set one.
+- [set_confirm_window](file:///C:/Users/Shepherd/projects/stellarsorter-contract/contracts/stellarsorter/src/lib.rs#L3355-L3362) — `set_confirm_window(env, admin, ledgers)`. Admin only. Sets the confirm-window ledger delta and emits `confirm_window_set`.
+- [get_confirm_window](file:///C:/Users/Shepherd/projects/stellarsorter-contract/contracts/stellarsorter/src/lib.rs#L3365-L3370) — `get_confirm_window(env) -> u32`. Read-only. Returns the active window; defaults to `DEFAULT_CONFIRM_WINDOW_LEDGERS = 86_400` (≈ 5 calendar days at 5 s / ledger) if admin has never set one.
 
 The force-confirm gate inside `force_confirm_milestone` is the **strict greater-than** inequality:
 
@@ -2360,7 +2360,7 @@ before the dispute window elapses, the dispute can be escalated to a configured
 super arbiter for a tie-breaking resolution (issue #246):
 
 ```
-   Company            Arbiter(s)           HireSettle           Super-Arbiter
+   Company            Arbiter(s)           StellarSorter           Super-Arbiter
       │                    │                    │                     │
       │ raise_dispute(engagement_id, milestone_index, reason)         │
       │────────────────────────────────────────▶│                     │
@@ -2434,10 +2434,10 @@ super arbiter for a tie-breaking resolution (issue #246):
 ## Project Structure
 
 ```
-hiresettle-contract-1/
+stellarsorter-contract-1/
 ├── Cargo.toml              # Workspace root
 ├── contracts/
-│   └── hiresettle/
+│   └── stellarsorter/
 │       ├── Cargo.toml      # Contract crate config
 │       ├── Makefile        # Build helpers
 │       └── src/
@@ -2454,7 +2454,7 @@ hiresettle-contract-1/
 Run the full test suite from the contract directory:
 
 ```bash
-cd contracts/hiresettle && cargo test
+cd contracts/stellarsorter && cargo test
 ```
 
 Tests cover creation, proof submission, confirmation, disputes, arbiter voting, replacement flow, early exit, amendments, batch confirmations, auto-confirm, expiry, admin configuration, and edge cases for all validation rules.
@@ -2467,7 +2467,7 @@ See [TESTING.md](TESTING.md) for how `test.rs` is organised, its shared helpers,
 
 ```rust
 // 1. Init contract
-HireSettleContract::init(env, admin);
+StellarSorterContract::init(env, admin);
 
 // 2. Create engagement
 let config = EngagementConfig {
@@ -2476,18 +2476,18 @@ let config = EngagementConfig {
     recruiter_split_bps: 10_000,
     contract_pdf_hash: Some(String::from_str(&env, "sha256:abc123...")),
 };
-HireSettleContract::create_engagement(
+StellarSorterContract::create_engagement(
     env, "engagement-1", company, recruiter,
     arbiter_setup, token, 100_000_000, "Senior Engineer",
     milestones, retention_days, config
 );
 
 // 3. Recruiter unlocks & submits proof
-HireSettleContract::unlock_milestone(env, "engagement-1", 1);
-HireSettleContract::submit_proof(env, recruiter, "engagement-1", 1, "ipfs://QmProof...");
+StellarSorterContract::unlock_milestone(env, "engagement-1", 1);
+StellarSorterContract::submit_proof(env, recruiter, "engagement-1", 1, "ipfs://QmProof...");
 
 // 4. Company confirms → payment released
-HireSettleContract::confirm_milestone(env, company, "engagement-1", 1);
+StellarSorterContract::confirm_milestone(env, company, "engagement-1", 1);
 ```
 
 ### Create a test engagement via CLI
