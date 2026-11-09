@@ -12,7 +12,7 @@
 //! arguments (e.g. `TagEmpty: index {}`) are listed by their fixed prefix.
 //!
 //! The table is generated; do not edit it by hand. After adding, renaming or
-//! removing a panic message, regenerate it from `contracts/hiresettle`:
+//! removing a panic message, regenerate it from `contracts/stellarsorter`:
 //!
 //! ```text
 //! python3 scripts/gen_errors_table.py

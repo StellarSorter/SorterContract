@@ -2,7 +2,7 @@ use soroban_sdk::{contractimpl, token, Address, Bytes, BytesN, Env, String, Vec}
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // INTERNAL HELPERS
     // ----------------------------------------------------------
