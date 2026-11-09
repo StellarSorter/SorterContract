@@ -1,6 +1,6 @@
 # StellarSorter — Recruitment Fee Settlement Contract
 
-[![Test Status](https://github.com/TrustHire/stellarsorter-contract/actions/workflows/test.yml/badge.svg)](https://github.com/TrustHire/stellarsorter-contract/actions/workflows/test.yml)
+[![Test Status](https://github.com/StellarSorter/SorterContract/actions/workflows/test.yml/badge.svg)](https://github.com/StellarSorter/SorterContract/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](contracts/stellarsorter/Cargo.toml)
 
@@ -23,8 +23,8 @@ Before getting started, ensure you have:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/TrustHire/stellarsorter-contract.git
-cd stellarsorter-contract
+git clone https://github.com/StellarSorter/SorterContract.git
+cd SorterContract
 ```
 
 ### Build the Contract
@@ -2874,16 +2874,8 @@ MIT
 
 ---
 
-## Handsoff notes
+## Roadmap
 
-<!-- handsoff-issue-579 -->
-
-- #579: feat: get_engagements_by_created_range query — filter by creation ledger
-
-<!-- handsoff-issue-580 -->
-
-- #580: feat: recruiter profile aggregate query
-
-<!-- handsoff-issue-582 -->
-
-- #582: feat: get_protocol_stats query — global totals for dashboards
+- feat: `get_engagements_by_created_range` query — filter by creation ledger
+- feat: recruiter profile aggregate query
+- feat: `get_protocol_stats` query — global totals for dashboards

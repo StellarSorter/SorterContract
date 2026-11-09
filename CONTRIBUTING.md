@@ -253,7 +253,7 @@ Push your branch to your fork:
 git push origin feature/<descriptive-name>
 ```
 
-Then open a PR on GitHub against `TrustHire/stellarsorter-contract:main`.
+Then open a PR on GitHub against `StellarSorter/SorterContract:main`.
 
 #### PR Template Checklist
 
