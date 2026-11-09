@@ -6,7 +6,7 @@ enum. This script scans every non-test source file for `panic!` calls, resolves
 the shared `ERR_*` constants declared in `errors.rs`, and rewrites the
 module-level doc table between the BEGIN/END markers in `errors.rs`.
 
-Usage (from `contracts/hiresettle`):
+Usage (from `contracts/stellarsorter`):
 
     python3 scripts/gen_errors_table.py          # rewrite src/errors.rs
     python3 scripts/gen_errors_table.py --check  # exit 1 if the table is stale
