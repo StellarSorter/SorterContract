@@ -2,12 +2,12 @@ use soroban_sdk::{contractimpl, Address, BytesN, Env, Map, String, Symbol, Vec};
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // INIT
     // ----------------------------------------------------------
 
-    /// Initializes the HireSettle contract.
+    /// Initializes the StellarSorter contract.
     ///
     /// # Caller
     /// Called by the contract deployer or initial administrator (`admin`). Requires authentication from `admin`.

@@ -2,7 +2,7 @@ use soroban_sdk::{contractimpl, Address, Env, String, Symbol};
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // ISSUE #43 — COMPANY TRANSFER
 
