@@ -2,7 +2,7 @@ use soroban_sdk::{contractimpl, token, Address, Env, String, Symbol, Vec};
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // CREATE ENGAGEMENT
     // ----------------------------------------------------------
