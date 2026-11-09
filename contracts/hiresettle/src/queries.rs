@@ -2,7 +2,7 @@ use soroban_sdk::{contractimpl, Address, BytesN, Env, Map, String, Vec};
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // READ-ONLY QUERIES
     // ----------------------------------------------------------
