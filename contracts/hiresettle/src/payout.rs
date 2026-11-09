@@ -6,14 +6,14 @@ use crate::*;
 
 /// Interface a trusted swap-adapter contract must implement (issues #458, #549).
 ///
-/// HireSettle first calls `quote` for the expected output, derives
+/// StellarSorter first calls `quote` for the expected output, derives
 /// `min_out = quote * (10_000 - max_slippage_bps) / 10_000` from the
 /// recipient's slippage tolerance, then calls `swap`. Inside `swap` the
-/// adapter pulls `amount_in` of `from_token` from `payer` (HireSettle
+/// adapter pulls `amount_in` of `from_token` from `payer` (StellarSorter
 /// pre-authorizes exactly that `transfer(payer, adapter, amount_in)`),
 /// delivers the swapped `to_token` amount to `recipient` and returns it.
 ///
-/// If the adapter cannot deliver at least `min_out` it must panic. HireSettle
+/// If the adapter cannot deliver at least `min_out` it must panic. StellarSorter
 /// invokes `swap` with `try_`, so the panic rolls back the adapter's pull and
 /// the payout falls back to the original token instead of failing.
 #[contractclient(name = "SwapAdapterClient")]
@@ -32,7 +32,7 @@ pub trait SwapAdapter {
 }
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // ISSUE #458 — RECRUITER PAYOUT TOKEN PREFERENCE
     // ----------------------------------------------------------
