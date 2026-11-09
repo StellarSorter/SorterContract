@@ -6,7 +6,7 @@ use soroban_sdk::{contractimpl, Address, Env, String, Vec};
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     /// Return one page of everything that happened on an engagement, oldest
     /// first: accepted split amendments, replacement requests, disputes raised
     /// and engagement status transitions.

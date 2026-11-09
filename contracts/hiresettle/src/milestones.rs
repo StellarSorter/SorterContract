@@ -2,7 +2,7 @@ use soroban_sdk::{contractimpl, token, Address, BytesN, Env, String, Symbol, Vec
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // UNLOCK RETENTION MILESTONE
     // ----------------------------------------------------------
