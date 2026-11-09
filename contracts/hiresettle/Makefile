@@ -1,7 +1,7 @@
-# HireSettle Contract — Makefile
+# StellarSorter Contract — Makefile
 
 NETWORK       = testnet
-CONTRACT_NAME = hiresettle
+CONTRACT_NAME = stellarsorter
 WASM_PATH     = target/wasm32v1-none/release/$(CONTRACT_NAME).wasm
 WASM_OPT      = target/wasm32v1-none/release/$(CONTRACT_NAME).optimized.wasm
 
