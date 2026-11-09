@@ -1,7 +1,7 @@
-//! # HireSettle Smart Contract
+//! # StellarSorter Smart Contract
 //!
 //! ## Overview
-//! The HireSettle smart contract provides escrow and settlement mechanisms for decentralized work
+//! The StellarSorter smart contract provides escrow and settlement mechanisms for decentralized work
 //! engagements. It manages the full lifecycle of milestone-based agreements, security retentions,
 //! disputes, and protocol fee distributions.
 //!
@@ -89,6 +89,6 @@ pub use payout::{SwapAdapter, SwapAdapterClient};
 
 /// Milestone-based recruiter fee escrow contract.
 #[contract]
-pub struct HireSettleContract;
+pub struct StellarSorterContract;
 
 mod test;
