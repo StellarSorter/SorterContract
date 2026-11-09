@@ -1,4 +1,4 @@
-//! Unit tests for the HireSettle contract.
+//! Unit tests for the StellarSorter contract.
 //!
 //! Every test runs against a fresh `Env` built by `setup()`, which registers
 //! the contract and a Stellar asset token, mocks all auths, mints escrow
@@ -62,7 +62,7 @@ fn setup() -> (Env, Address, Address, Address, Address, Address) {
         max_entry_ttl: 6_300_000,
     });
 
-    let contract_id = env.register(HireSettleContract, ());
+    let contract_id = env.register(StellarSorterContract, ());
 
     let token_admin = Address::generate(&env);
     let token_id = env
@@ -75,7 +75,7 @@ fn setup() -> (Env, Address, Address, Address, Address, Address) {
 
     token_client.mint(&company, &500_000_000_000);
 
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.init(&company);
 
     (env, contract_id, token_id, company, recruiter, arbiter)
@@ -125,7 +125,7 @@ fn build_milestones(env: &Env) -> Vec<Milestone> {
 
 fn create_standard_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -205,7 +205,7 @@ fn default_config() -> EngagementConfig {
 #[test]
 fn test_create_engagement_success() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     create_standard_engagement(
@@ -240,7 +240,7 @@ fn test_create_engagement_success() {
 #[should_panic(expected = "milestone percentages must sum to 100")]
 fn test_create_engagement_invalid_percentages() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let bad_milestones = vec![
         &env,
@@ -289,7 +289,7 @@ fn test_create_engagement_invalid_percentages() {
 #[test]
 fn test_placement_milestone_flow() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     create_standard_engagement(
@@ -322,7 +322,7 @@ fn test_placement_milestone_flow() {
 #[test]
 fn test_retention_milestone_unlock_timing() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-001");
     create_standard_engagement(
@@ -349,7 +349,7 @@ fn test_retention_milestone_unlock_timing() {
 #[should_panic(expected = "retention window has not elapsed yet")]
 fn test_cannot_unlock_before_window() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-001",
@@ -361,7 +361,7 @@ fn test_cannot_unlock_before_window() {
 #[test]
 fn test_full_engagement_lifecycle() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-FULL");
@@ -410,7 +410,7 @@ fn test_full_engagement_lifecycle() {
 #[test]
 fn test_raise_and_resolve_dispute_approve() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-DISPUTE");
@@ -447,7 +447,7 @@ fn test_raise_and_resolve_dispute_approve() {
 #[test]
 fn test_raise_and_resolve_dispute_reject() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-REJECT");
@@ -479,7 +479,7 @@ fn test_raise_and_resolve_dispute_reject() {
 #[test]
 fn test_request_replacement() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-REPLACE");
@@ -534,7 +534,7 @@ fn test_request_replacement() {
 #[should_panic(expected = "placement not yet confirmed")]
 fn test_request_replacement_before_placement() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-EARLY");
     create_standard_engagement(
@@ -553,7 +553,7 @@ fn test_request_replacement_before_placement() {
 #[test]
 fn test_cancel_engagement() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-CANCEL");
@@ -579,7 +579,7 @@ fn test_cancel_engagement() {
 #[test]
 fn test_partial_cancel_after_placement_confirmed() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-PARTIAL-CANCEL");
@@ -621,7 +621,7 @@ fn test_partial_cancel_after_placement_confirmed() {
 #[should_panic(expected = "unauthorized")]
 fn test_unauthorized_confirm() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-AUTH");
     create_standard_engagement(
@@ -640,7 +640,7 @@ fn test_unauthorized_confirm() {
 #[test]
 fn test_ledgers_until_unlock() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-TIMER");
     create_standard_engagement(
@@ -661,7 +661,7 @@ fn test_ledgers_until_unlock() {
 #[test]
 fn test_two_milestone_engagement_50_50() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let milestones = vec![
@@ -739,7 +739,7 @@ fn test_two_milestone_engagement_50_50() {
 #[test]
 fn test_get_total_released_zero() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REL-ZERO");
     create_standard_engagement(
         &env,
@@ -756,7 +756,7 @@ fn test_get_total_released_zero() {
 #[test]
 fn test_get_total_released_partial() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REL-PART");
     create_standard_engagement(
         &env,
@@ -781,7 +781,7 @@ fn test_get_total_released_partial() {
 #[test]
 fn test_get_total_released_full() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REL-FULL");
     create_standard_engagement(
         &env,
@@ -831,7 +831,7 @@ fn test_get_total_released_full() {
 #[test]
 fn test_get_engagement_summary_after_create() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-SUMM-CREATE");
     create_standard_engagement(
         &env,
@@ -858,7 +858,7 @@ fn test_get_engagement_summary_after_create() {
 #[test]
 fn test_get_engagement_summary_after_partial_confirmations() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-SUMM-PART");
     create_standard_engagement(
         &env,
@@ -887,7 +887,7 @@ fn test_get_engagement_summary_after_partial_confirmations() {
 #[test]
 fn test_get_engagement_summary_after_completion() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-SUMM-DONE");
     create_standard_engagement(
         &env,
@@ -940,7 +940,7 @@ fn test_get_engagement_summary_after_completion() {
 #[test]
 fn test_batch_get_engagement_summary_multiple() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "BATCH-1",
@@ -979,7 +979,7 @@ fn test_batch_get_engagement_summary_multiple() {
 #[test]
 fn test_batch_get_engagement_summary_skips_missing() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -1007,7 +1007,7 @@ fn test_batch_get_engagement_summary_skips_missing() {
 #[test]
 fn test_batch_get_engagement_summary_empty_input() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let ids: Vec<String> = Vec::new(&env);
     let summaries = client.batch_get_engagement_summary(&ids);
@@ -1018,7 +1018,7 @@ fn test_batch_get_engagement_summary_empty_input() {
 #[should_panic(expected = "too many IDs")]
 fn test_batch_get_engagement_summary_too_many_ids() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Build 21 IDs — all nonexistent, we just need to trigger the cap.
     let names = [
@@ -1039,7 +1039,7 @@ fn test_batch_get_engagement_summary_too_many_ids() {
 #[test]
 fn test_cancel_full_refund_zero_released() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CANCEL-ZERO");
     let company_balance_before = token_client.balance(&company);
@@ -1063,7 +1063,7 @@ fn test_cancel_full_refund_zero_released() {
 #[should_panic(expected = "unauthorized")]
 fn test_cancel_wrong_recruiter_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-CANCEL-AUTH");
     create_standard_engagement(
         &env,
@@ -1085,7 +1085,7 @@ fn test_cancel_wrong_recruiter_rejected() {
 #[test]
 fn test_happy_arbiter_succession() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARBITER");
     create_standard_engagement(
         &env,
@@ -1113,7 +1113,7 @@ fn test_happy_arbiter_succession() {
 #[should_panic(expected = "unauthorized")]
 fn test_wrong_claimer_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARBITER-BAD");
     create_standard_engagement(
         &env,
@@ -1134,7 +1134,7 @@ fn test_wrong_claimer_rejected() {
 #[test]
 fn test_old_arbiter_retains_role_until_claim() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARBITER-OLD");
     create_standard_engagement(
         &env,
@@ -1172,7 +1172,7 @@ fn test_old_arbiter_retains_role_until_claim() {
 #[should_panic(expected = "duplicate vote")]
 fn test_arbiter_successor_cannot_double_vote_mid_dispute() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -1226,7 +1226,7 @@ fn test_arbiter_successor_cannot_double_vote_mid_dispute() {
 #[test]
 fn test_arbiter_successor_seat_migrated_not_duplicated() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -1276,7 +1276,7 @@ fn test_arbiter_successor_seat_migrated_not_duplicated() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_arbiter_cannot_nominate() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARBITER-UNAUTH");
     create_standard_engagement(
         &env,
@@ -1295,7 +1295,7 @@ fn test_non_arbiter_cannot_nominate() {
 #[should_panic(expected = "no pending arbiter nomination")]
 fn test_claim_without_nomination_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARBITER-NOCLAIM");
     create_standard_engagement(
         &env,
@@ -1317,7 +1317,7 @@ fn test_claim_without_nomination_panics() {
 #[test]
 fn test_estimated_unlock_seconds_future() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-SECS-FUTURE");
     create_standard_engagement(
         &env,
@@ -1340,7 +1340,7 @@ fn test_estimated_unlock_seconds_future() {
 #[test]
 fn test_estimated_unlock_seconds_already_unlockable() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-SECS-ZERO");
     create_standard_engagement(
         &env,
@@ -1361,7 +1361,7 @@ fn test_estimated_unlock_seconds_already_unlockable() {
 #[test]
 fn test_estimated_unlock_seconds_placement_returns_zero() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-SECS-PLACE");
     create_standard_engagement(
         &env,
@@ -1385,7 +1385,7 @@ fn test_estimated_unlock_seconds_placement_returns_zero() {
 #[test]
 fn test_metadata_hash_present() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let cid = String::from_str(&env, "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
     client.create_engagement(
@@ -1429,7 +1429,7 @@ fn test_metadata_hash_present() {
 #[test]
 fn test_metadata_hash_absent() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -1449,7 +1449,7 @@ fn test_metadata_hash_absent() {
 #[should_panic(expected = "InvalidMetadataHash")]
 fn test_metadata_hash_empty_string_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-EMPTY-META"),
@@ -1493,7 +1493,7 @@ fn test_metadata_hash_empty_string_rejected() {
 #[test]
 fn test_co_recruiter_60_40_split() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let co_recruiter = Address::generate(&env);
 
@@ -1560,7 +1560,7 @@ fn test_co_recruiter_60_40_split() {
 #[test]
 fn test_no_co_recruiter_full_payout() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     create_standard_engagement(
@@ -1591,7 +1591,7 @@ fn test_no_co_recruiter_full_payout() {
 #[should_panic(expected = "InvalidSplitBps")]
 fn test_split_bps_over_10000_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let co_recruiter = Address::generate(&env);
 
     let config = EngagementConfig {
@@ -1634,7 +1634,7 @@ fn test_split_bps_over_10000_rejected() {
 #[test]
 fn test_co_recruiter_gets_remainder() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let co_recruiter = Address::generate(&env);
 
@@ -1696,7 +1696,7 @@ fn test_co_recruiter_gets_remainder() {
 #[test]
 fn test_co_recruiter_summary_fields() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let co_recruiter = Address::generate(&env);
 
     let config = EngagementConfig {
@@ -1743,7 +1743,7 @@ fn test_co_recruiter_summary_fields() {
 #[test]
 fn test_split_bps_10000_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let co_recruiter = Address::generate(&env);
 
@@ -1808,7 +1808,7 @@ fn test_split_bps_10000_accepted() {
 #[test]
 fn test_rejected_proof_can_be_resubmitted_immediately() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-COOL");
     create_standard_engagement(
@@ -1842,7 +1842,7 @@ fn test_rejected_proof_can_be_resubmitted_immediately() {
 #[test]
 fn test_proof_cooldown_passes_after_wait() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-COOL-PASS");
     create_standard_engagement(
@@ -1884,7 +1884,7 @@ fn test_proof_cooldown_passes_after_wait() {
 #[should_panic(expected = "DuplicateProofHash")]
 fn test_duplicate_proof_hash_rejected_across_milestones() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-DUP-PROOF");
     create_standard_engagement(
@@ -1909,7 +1909,7 @@ fn test_duplicate_proof_hash_rejected_across_milestones() {
 #[test]
 fn test_different_proof_hashes_allowed_across_milestones() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-DIFF-PROOF");
     create_standard_engagement(
@@ -1947,7 +1947,7 @@ fn test_different_proof_hashes_allowed_across_milestones() {
 #[test]
 fn test_set_proof_cooldown_admin() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Admin (company) sets a very short cooldown of 1 ledger
     client.set_proof_cooldown(&company, &1u32);
@@ -1990,7 +1990,7 @@ fn test_set_proof_cooldown_admin() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_proof_cooldown_non_admin() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // recruiter is not admin — should panic
     client.set_proof_cooldown(&recruiter, &100u32);
 }
@@ -2002,7 +2002,7 @@ fn test_set_proof_cooldown_non_admin() {
 #[test]
 fn test_quorum_2_of_3_approve() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2050,7 +2050,7 @@ fn test_quorum_2_of_3_approve() {
 #[test]
 fn test_quorum_2_of_3_reject() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2099,7 +2099,7 @@ fn test_quorum_2_of_3_reject() {
 #[should_panic(expected = "duplicate vote")]
 fn test_duplicate_vote_rejected() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -2139,7 +2139,7 @@ fn test_duplicate_vote_rejected() {
 #[test]
 fn test_single_arbiter_backward_compat() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-SINGLE");
@@ -2173,7 +2173,7 @@ fn test_single_arbiter_backward_compat() {
 fn test_quorum_unanimous_requires_all_approvals() {
     // quorum == arbiters.len(): every arbiter must approve before release.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2230,7 +2230,7 @@ fn test_quorum_unanimous_single_reject_resets_milestone() {
     // quorum == arbiters.len(): total_arbiters - quorum == 0, so a single
     // reject vote already exceeds the threshold and resets the milestone.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2275,7 +2275,7 @@ fn test_quorum_unanimous_single_reject_resets_milestone() {
 fn test_quorum_unanimous_2_of_2_approve() {
     // Smallest multi-arbiter unanimous case: quorum == arbiters.len() == 2.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2321,7 +2321,7 @@ fn test_quorum_unanimous_2_of_2_approve() {
 fn test_quorum_unanimous_4_of_4_approve() {
     // Generalizes the unanimous case beyond 3 arbiters.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2374,7 +2374,7 @@ fn test_quorum_unanimous_mixed_votes_reject_wins() {
     // single reject vote exceeds the (total_arbiters - quorum == 0)
     // threshold and immediately resets the milestone.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2423,7 +2423,7 @@ fn test_quorum_unanimous_mixed_votes_reject_wins() {
 #[should_panic(expected = "unauthorized")]
 fn test_quorum_unanimous_non_arbiter_cannot_vote() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -2466,7 +2466,7 @@ fn test_quorum_unanimous_vote_record_cleared_after_reset() {
     // so a later dispute round starts fresh (no stale duplicate-vote panics
     // and no carry-over vote counts).
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2532,7 +2532,7 @@ fn test_quorum_unanimous_vote_record_cleared_after_reset() {
 #[should_panic(expected = "duplicate vote")]
 fn test_quorum_unanimous_duplicate_vote_panics() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -2576,7 +2576,7 @@ fn test_quorum_unanimous_vote_after_resolution_panics() {
     // an arbiter who already voted, since the vote record was cleared) must
     // be rejected because the milestone is no longer Disputed.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -2624,7 +2624,7 @@ fn test_quorum_unanimous_vote_without_dispute_panics() {
     // A milestone must actually be Disputed before any arbiter can vote,
     // even under an otherwise-valid unanimous quorum setup.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -2663,7 +2663,7 @@ fn test_quorum_unanimous_fee_paid_only_to_deciding_arbiter() {
     // The arbiter fee is transferred to whichever arbiter's vote tips the
     // count to quorum, not split across all arbiters who voted.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     client.set_arbiter_fee(&company, &100u32); // 1%
@@ -2716,7 +2716,7 @@ fn test_quorum_unanimous_final_milestone_completes_engagement() {
     // Resolving the last outstanding milestone via unanimous quorum must
     // mark the engagement Completed and decrement the company's active count.
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -2802,7 +2802,7 @@ fn test_quorum_unanimous_final_milestone_completes_engagement() {
 #[test]
 fn test_platform_fee_deducted_and_sent_to_treasury() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -2834,7 +2834,7 @@ fn test_platform_fee_deducted_and_sent_to_treasury() {
 #[should_panic(expected = "FeeTooHigh")]
 fn test_platform_fee_cap_validation() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let treasury = Address::generate(&env);
 
     client.set_platform_fee(&company, &501, &treasury);
@@ -2844,7 +2844,7 @@ fn test_platform_fee_cap_validation() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_set_platform_fee() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let treasury = Address::generate(&env);
 
     client.set_platform_fee(&recruiter, &100, &treasury);
@@ -2853,7 +2853,7 @@ fn test_non_admin_cannot_set_platform_fee() {
 #[test]
 fn test_platform_fee_event_emitted_with_correct_amount() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let treasury = Address::generate(&env);
 
     client.set_platform_fee(&company, &100, &treasury); // 1%
@@ -2882,7 +2882,7 @@ fn test_platform_fee_event_emitted_with_correct_amount() {
 #[test]
 fn test_platform_fee_event_not_emitted_when_fee_zero() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-NO-FEE-EVENT");
 
     create_standard_engagement(
@@ -2912,7 +2912,7 @@ fn test_platform_fee_event_not_emitted_when_fee_zero() {
 #[test]
 fn test_platform_fee_floor_raises_small_fees() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -2945,7 +2945,7 @@ fn test_platform_fee_floor_raises_small_fees() {
 #[test]
 fn test_platform_fee_floor_does_not_lower_higher_fees() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -2978,7 +2978,7 @@ fn test_platform_fee_floor_does_not_lower_higher_fees() {
 #[test]
 fn test_platform_fee_floor_never_exceeds_payout() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -3010,7 +3010,7 @@ fn test_platform_fee_floor_never_exceeds_payout() {
 #[test]
 fn test_platform_fee_floor_zero_is_noop() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -3041,7 +3041,7 @@ fn test_platform_fee_floor_zero_is_noop() {
 #[should_panic(expected = "InvalidFeeFloor")]
 fn test_platform_fee_floor_rejects_negative() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_platform_fee_floor(&company, &-1);
 }
 
@@ -3049,7 +3049,7 @@ fn test_platform_fee_floor_rejects_negative() {
 #[should_panic(expected = "unauthorized")]
 fn test_platform_fee_floor_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_platform_fee_floor(&recruiter, &1_000_000);
 }
 
@@ -3060,7 +3060,7 @@ fn test_platform_fee_floor_non_admin_rejected() {
 #[test]
 fn test_token_platform_fee_overrides_global_rate() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -3095,7 +3095,7 @@ fn test_token_platform_fee_overrides_global_rate() {
 #[test]
 fn test_token_platform_fee_removed_falls_back_to_global() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -3129,7 +3129,7 @@ fn test_token_platform_fee_removed_falls_back_to_global() {
 #[test]
 fn test_token_platform_fee_applies_with_floor() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -3164,7 +3164,7 @@ fn test_token_platform_fee_applies_with_floor() {
 #[should_panic(expected = "FeeTooHigh")]
 fn test_token_platform_fee_cap_validation() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_token_platform_fee(&company, &token_id, &501);
 }
 
@@ -3172,14 +3172,14 @@ fn test_token_platform_fee_cap_validation() {
 #[should_panic(expected = "unauthorized")]
 fn test_token_platform_fee_non_admin_rejected() {
     let (env, contract_id, token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_token_platform_fee(&recruiter, &token_id, &100);
 }
 
 #[test]
 fn test_multiple_tokens_different_overrides() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     
     // Create second token
     let token_admin2 = Address::generate(&env);
@@ -3207,7 +3207,7 @@ fn test_multiple_tokens_different_overrides() {
 #[test]
 fn test_pause_state_and_unpause_restores_create() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert!(!client.is_paused());
     client.pause(&company);
@@ -3236,7 +3236,7 @@ fn test_pause_state_and_unpause_restores_create() {
 #[should_panic(expected = "ContractPaused")]
 fn test_pause_blocks_create() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.pause(&company);
     create_standard_engagement(
@@ -3254,7 +3254,7 @@ fn test_pause_blocks_create() {
 #[should_panic(expected = "ContractPaused")]
 fn test_pause_blocks_submit() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSED-SUBMIT");
     create_standard_engagement(
         &env,
@@ -3279,7 +3279,7 @@ fn test_pause_blocks_submit() {
 #[should_panic(expected = "ContractPaused")]
 fn test_pause_blocks_confirm() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSED-CONFIRM");
     create_standard_engagement(
         &env,
@@ -3305,7 +3305,7 @@ fn test_pause_blocks_confirm() {
 #[should_panic(expected = "ContractPaused")]
 fn test_pause_blocks_unlock() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSED-UNLOCK");
     create_standard_engagement(
         &env,
@@ -3336,7 +3336,7 @@ fn test_pause_blocks_unlock() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_pause_or_unpause() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.pause(&recruiter);
 }
@@ -3349,7 +3349,7 @@ fn test_non_admin_cannot_pause_or_unpause() {
 #[should_panic(expected = "EngagementPaused")]
 fn test_engagement_pause_blocks_lifecycle_while_contract_runs() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-QUARANTINE");
 
     create_standard_engagement(
@@ -3379,7 +3379,7 @@ fn test_engagement_pause_blocks_lifecycle_while_contract_runs() {
 #[test]
 fn test_global_unpause_does_not_clear_engagement_pause() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-QUARANTINE-INTERACTION");
 
     create_standard_engagement(
@@ -3433,7 +3433,7 @@ fn test_global_unpause_does_not_clear_engagement_pause() {
 #[test]
 fn test_engagement_unpause_does_not_clear_global_pause() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-QUARANTINE-GLOBAL");
 
     create_standard_engagement(
@@ -3476,7 +3476,7 @@ fn test_engagement_unpause_does_not_clear_global_pause() {
 #[test]
 fn test_engagement_pause_query_unknown_id_false() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Unknown engagement IDs report false rather than panicking.
     assert!(!client.is_engagement_paused(&String::from_str(&env, "ENG-DOES-NOT-EXIST")));
@@ -3489,7 +3489,7 @@ fn test_engagement_pause_query_unknown_id_false() {
 #[test]
 fn test_admin_rotation_happy_path() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let treasury = Address::generate(&env);
 
     client.nominate_admin(&company, &recruiter);
@@ -3506,7 +3506,7 @@ fn test_admin_rotation_happy_path() {
 #[should_panic(expected = "unauthorized")]
 fn test_wrong_admin_claimer_rejected() {
     let (env, contract_id, _token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.nominate_admin(&company, &recruiter);
     client.claim_admin(&arbiter);
@@ -3515,7 +3515,7 @@ fn test_wrong_admin_claimer_rejected() {
 #[test]
 fn test_old_admin_retains_power_until_claim() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let treasury = Address::generate(&env);
 
     client.nominate_admin(&company, &recruiter);
@@ -3528,7 +3528,7 @@ fn test_old_admin_retains_power_until_claim() {
 #[should_panic(expected = "unauthorized")]
 fn test_only_current_admin_can_nominate_admin() {
     let (env, contract_id, _token_id, _company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.nominate_admin(&recruiter, &arbiter);
 }
@@ -3540,14 +3540,14 @@ fn test_only_current_admin_can_nominate_admin() {
 #[test]
 fn test_engagement_count_starts_at_zero() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     assert_eq!(client.get_engagement_count(), 0);
 }
 
 #[test]
 fn test_engagement_count_increments_on_create() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -3575,7 +3575,7 @@ fn test_engagement_count_increments_on_create() {
 #[test]
 fn test_engagement_count_does_not_decrement_on_cancel() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -3600,7 +3600,7 @@ fn test_engagement_count_does_not_decrement_on_cancel() {
 #[should_panic(expected = "engagement already exists")]
 fn test_engagement_count_no_increment_on_failed_create() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Should panic due to duplicate ID (count must NOT increment)
     create_standard_engagement(
@@ -3630,7 +3630,7 @@ fn test_engagement_count_no_increment_on_failed_create() {
 #[test]
 fn test_company_engagement_count_empty() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other = Address::generate(&env);
     assert_eq!(client.get_company_engagement_count(&other), 0);
 }
@@ -3638,7 +3638,7 @@ fn test_company_engagement_count_empty() {
 #[test]
 fn test_get_engagements_by_company_insertion_order() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let ids = [
         "ENG-ORD-0",
@@ -3681,7 +3681,7 @@ fn test_get_engagements_by_company_insertion_order() {
 #[test]
 fn test_get_engagements_by_company_out_of_range_returns_empty() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-OOR",
@@ -3694,7 +3694,7 @@ fn test_get_engagements_by_company_out_of_range_returns_empty() {
 #[test]
 fn test_get_engagements_by_company_empty_company() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other = Address::generate(&env);
     let result = client.get_engagements_by_company(&other, &0, &10);
     assert_eq!(result.len(), 0);
@@ -3707,7 +3707,7 @@ fn test_get_engagements_by_company_empty_company() {
 #[test]
 fn test_get_engagements_by_company_large_page_size_does_not_overflow() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -3729,7 +3729,7 @@ fn test_get_engagements_by_company_large_page_size_does_not_overflow() {
 #[test]
 fn test_get_engagements_first_page_ten() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let ids = [
         "ENG-PG-00",
@@ -3779,7 +3779,7 @@ fn test_get_engagements_first_page_ten() {
 #[test]
 fn test_recruiter_engagement_count_empty() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other = Address::generate(&env);
     assert_eq!(client.get_recruiter_engagement_count(&other), 0);
 }
@@ -3787,7 +3787,7 @@ fn test_recruiter_engagement_count_empty() {
 #[test]
 fn test_get_engagements_by_recruiter_insertion_order() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let ids = [
         "ENG-R-ORD-0",
@@ -3830,7 +3830,7 @@ fn test_get_engagements_by_recruiter_insertion_order() {
 #[test]
 fn test_get_engagements_by_recruiter_out_of_range_returns_empty() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -3849,7 +3849,7 @@ fn test_get_engagements_by_recruiter_out_of_range_returns_empty() {
 #[test]
 fn test_get_engagements_by_recruiter_empty_recruiter() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other = Address::generate(&env);
     let result = client.get_engagements_by_recruiter(&other, &0, &10);
     assert_eq!(result.len(), 0);
@@ -3858,7 +3858,7 @@ fn test_get_engagements_by_recruiter_empty_recruiter() {
 #[test]
 fn test_get_engagements_by_recruiter_multi_recruiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other_recruiter = Address::generate(&env);
 
     client.create_engagement(
@@ -3919,7 +3919,7 @@ fn test_get_engagements_by_recruiter_multi_recruiter() {
 #[test]
 fn test_allowlist_disabled_by_default_allows_any_token() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // Allowlist disabled by default — standard engagement must succeed
     create_standard_engagement(
         &env,
@@ -3941,7 +3941,7 @@ fn test_allowlist_disabled_by_default_allows_any_token() {
 #[test]
 fn test_allowlisted_token_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.add_allowed_token(&company, &token_id);
     client.set_token_allowlist_enabled(&company, &true);
@@ -3967,7 +3967,7 @@ fn test_allowlisted_token_accepted() {
 #[should_panic(expected = "TokenNotAllowed")]
 fn test_non_allowlisted_token_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Enable allowlist but do NOT add token_id
     client.set_token_allowlist_enabled(&company, &true);
@@ -3986,7 +3986,7 @@ fn test_non_allowlisted_token_rejected() {
 #[test]
 fn test_allowlist_disabled_accepts_any_token() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Enable then disable
     client.set_token_allowlist_enabled(&company, &true);
@@ -4006,7 +4006,7 @@ fn test_allowlist_disabled_accepts_any_token() {
 #[test]
 fn test_get_allowed_tokens_returns_correct_list() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_allowed_tokens().len(), 0);
 
@@ -4019,7 +4019,7 @@ fn test_get_allowed_tokens_returns_correct_list() {
 #[test]
 fn test_remove_allowed_token() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.add_allowed_token(&company, &token_id);
     assert_eq!(client.get_allowed_tokens().len(), 1);
@@ -4032,7 +4032,7 @@ fn test_remove_allowed_token() {
 #[should_panic(expected = "unauthorized")]
 fn test_only_admin_can_add_allowed_token() {
     let (env, contract_id, token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.add_allowed_token(&recruiter, &token_id);
 }
 
@@ -4043,7 +4043,7 @@ fn test_only_admin_can_add_allowed_token() {
 // #[test]
 // fn test_batch_confirm_all_milestones() {
 //     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-//     let client = HireSettleContractClient::new(&env, &contract_id);
+//     let client = StellarSorterContractClient::new(&env, &contract_id);
 //     let token_client = token::Client::new(&env, &token_id);
 
 //     // Use a 2-milestone engagement (placement only) to simplify
@@ -4097,7 +4097,7 @@ fn test_only_admin_can_add_allowed_token() {
 #[test]
 fn test_engagement_completed_event_on_last_milestone() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-COMPLETE-EVT");
     create_standard_engagement(
@@ -4147,7 +4147,7 @@ fn test_engagement_completed_event_on_last_milestone() {
 #[test]
 fn test_engagement_completed_not_emitted_on_cancel() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-CANCEL-EVT");
     create_standard_engagement(
@@ -4171,7 +4171,7 @@ fn test_engagement_completed_not_emitted_on_cancel() {
 #[test]
 fn test_dispute_reason_stored_and_retrievable() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-REASON");
     create_standard_engagement(
@@ -4204,7 +4204,7 @@ fn test_dispute_reason_stored_and_retrievable() {
 #[test]
 fn test_dispute_reason_cleared_after_resolution() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-REASON-CLEAR");
     create_standard_engagement(
@@ -4235,7 +4235,7 @@ fn test_dispute_reason_cleared_after_resolution() {
 #[should_panic(expected = "ReasonTooLong")]
 fn test_dispute_reason_too_long_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-REASON-LONG");
     create_standard_engagement(
@@ -4263,7 +4263,7 @@ fn test_dispute_reason_too_long_rejected() {
 #[test]
 fn test_dispute_reason_cleared_after_reject_resolution() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-REASON-REJECT");
     create_standard_engagement(
@@ -4303,7 +4303,7 @@ fn test_dispute_reason_cleared_after_reject_resolution() {
 #[test]
 fn test_get_confirm_window_default() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // Default is 86_400 ledgers (~5 days)
     assert_eq!(client.get_confirm_window(), 86_400);
 }
@@ -4311,7 +4311,7 @@ fn test_get_confirm_window_default() {
 #[test]
 fn test_set_confirm_window_admin() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_confirm_window(&company, &500u32);
     assert_eq!(client.get_confirm_window(), 500);
 }
@@ -4320,7 +4320,7 @@ fn test_set_confirm_window_admin() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_confirm_window_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_confirm_window(&recruiter, &500u32);
 }
 
@@ -4329,7 +4329,7 @@ fn test_set_confirm_window_non_admin_rejected() {
 #[should_panic(expected = "ConfirmWindowNotElapsed")]
 fn test_force_confirm_before_window_fails() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Short window: 100 ledgers
     client.set_confirm_window(&company, &100u32);
@@ -4363,7 +4363,7 @@ fn test_force_confirm_before_window_fails() {
 #[test]
 fn test_force_confirm_after_window_releases_payment() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     // Short window: 100 ledgers
@@ -4410,7 +4410,7 @@ fn test_force_confirm_after_window_releases_payment() {
 #[test]
 fn test_force_confirm_emits_event() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_confirm_window(&company, &100u32);
 
@@ -4443,7 +4443,7 @@ fn test_force_confirm_emits_event() {
 #[should_panic(expected = "milestone is not in ProofSubmitted status")]
 fn test_force_confirm_wrong_status_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_confirm_window(&company, &100u32);
 
@@ -4468,7 +4468,7 @@ fn test_force_confirm_wrong_status_rejected() {
 #[should_panic(expected = "milestone is not in ProofSubmitted status")]
 fn test_force_confirm_locked_milestone_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_confirm_window(&company, &100u32);
 
@@ -4492,7 +4492,7 @@ fn test_force_confirm_locked_milestone_rejected() {
 #[test]
 fn test_force_confirm_last_milestone_completes_engagement() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     // Short window: 100 ledgers — set before creating engagement
@@ -4555,7 +4555,7 @@ fn test_force_confirm_last_milestone_completes_engagement() {
 #[test]
 fn test_get_dispute_window_default() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // Default is 51_840 ledgers (~3 days)
     assert_eq!(client.get_dispute_window(), 51_840);
 }
@@ -4563,7 +4563,7 @@ fn test_get_dispute_window_default() {
 #[test]
 fn test_set_dispute_window_admin() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_dispute_window(&company, &200u32);
     assert_eq!(client.get_dispute_window(), 200);
 }
@@ -4572,7 +4572,7 @@ fn test_set_dispute_window_admin() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_dispute_window_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_dispute_window(&recruiter, &200u32);
 }
 
@@ -4580,7 +4580,7 @@ fn test_set_dispute_window_non_admin_rejected() {
 #[test]
 fn test_dispute_within_window_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Short window: 200 ledgers
     client.set_dispute_window(&company, &200u32);
@@ -4617,7 +4617,7 @@ fn test_dispute_within_window_accepted() {
 #[should_panic(expected = "DisputeWindowClosed")]
 fn test_dispute_outside_window_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Short window: 200 ledgers
     client.set_dispute_window(&company, &200u32);
@@ -4650,7 +4650,7 @@ fn test_dispute_outside_window_rejected() {
 #[test]
 fn test_dispute_at_boundary_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Window: 200 ledgers. proof submitted at ledger 100.
     // Boundary: current_ledger == 100 + 200 == 300.
@@ -4688,7 +4688,7 @@ fn test_dispute_at_boundary_accepted() {
 #[should_panic(expected = "DisputeWindowClosed")]
 fn test_dispute_one_past_boundary_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_dispute_window(&company, &200u32);
 
@@ -4720,7 +4720,7 @@ fn test_dispute_one_past_boundary_rejected() {
 #[test]
 fn test_dispute_window_admin_update_takes_effect() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Start with a tight window of 50 ledgers
     client.set_dispute_window(&company, &50u32);
@@ -4766,7 +4766,7 @@ fn test_dispute_window_admin_update_takes_effect() {
 
 fn create_engagement_with_id(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -4794,7 +4794,7 @@ fn create_engagement_with_id(
 #[test]
 fn test_engagement_id_standard_format_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // Documented example format
     create_engagement_with_id(
         &env,
@@ -4816,7 +4816,7 @@ fn test_engagement_id_standard_format_accepted() {
 #[test]
 fn test_engagement_id_all_alphanumeric_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_id(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG001",
     );
@@ -4831,7 +4831,7 @@ fn test_engagement_id_all_alphanumeric_accepted() {
 #[test]
 fn test_engagement_id_64_chars_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // Exactly 64 characters
     let id = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     assert_eq!(id.len(), 64);
@@ -4846,7 +4846,7 @@ fn test_engagement_id_64_chars_accepted() {
 #[should_panic(expected = "InvalidEngagementId")]
 fn test_engagement_id_65_chars_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     // Exactly 65 characters
     let id = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     assert_eq!(id.len(), 65);
@@ -4857,7 +4857,7 @@ fn test_engagement_id_65_chars_rejected() {
 #[should_panic(expected = "InvalidEngagementId")]
 fn test_engagement_id_empty_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_id(&env, &client, &token_id, &company, &recruiter, &arbiter, "");
 }
 
@@ -4865,7 +4865,7 @@ fn test_engagement_id_empty_rejected() {
 #[should_panic(expected = "InvalidEngagementId")]
 fn test_engagement_id_space_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_id(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG 001",
     );
@@ -4875,7 +4875,7 @@ fn test_engagement_id_space_rejected() {
 #[should_panic(expected = "InvalidEngagementId")]
 fn test_engagement_id_slash_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_id(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG/001",
     );
@@ -4885,7 +4885,7 @@ fn test_engagement_id_slash_rejected() {
 #[should_panic(expected = "InvalidEngagementId")]
 fn test_engagement_id_underscore_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_id(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG_001",
     );
@@ -4895,7 +4895,7 @@ fn test_engagement_id_underscore_rejected() {
 #[should_panic(expected = "InvalidEngagementId")]
 fn test_engagement_id_dot_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_id(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG.001",
     );
@@ -4909,7 +4909,7 @@ fn test_engagement_id_dot_rejected() {
 /// is accepted by the contract's precondition.
 fn confirm_placement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     eng_id: &String,
     company: &Address,
     recruiter: &Address,
@@ -4926,7 +4926,7 @@ fn confirm_placement(
 #[test]
 fn test_replacement_reason_stored_and_retrievable() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REASON-1");
     create_standard_engagement(
         &env,
@@ -4954,7 +4954,7 @@ fn test_replacement_reason_empty_string_accepted() {
     // Empty reason is allowed — the issue says "max 128 chars", not "non-empty".
     // Auditors can still see the entry exists even with no code attached.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REASON-EMPTY");
     create_standard_engagement(
         &env,
@@ -4977,7 +4977,7 @@ fn test_replacement_reason_empty_string_accepted() {
 #[should_panic(expected = "replacement reason too long")]
 fn test_replacement_reason_too_long_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REASON-LONG");
     create_standard_engagement(
         &env,
@@ -5001,7 +5001,7 @@ fn test_replacement_reason_too_long_rejected() {
 #[test]
 fn test_replacement_reason_multi_replacement() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REASON-MULTI");
     create_standard_engagement(
         &env,
@@ -5039,7 +5039,7 @@ fn test_replacement_reason_multi_replacement() {
 #[test]
 fn test_replacement_reason_event_payload_includes_reason() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-REASON-EVT");
     create_standard_engagement(
         &env,
@@ -5076,7 +5076,7 @@ fn test_replacement_reason_event_payload_includes_reason() {
 #[test]
 fn test_milestone_unlock_event_carries_ledger_evidence() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-UNLOCK-EVT");
     create_standard_engagement(
         &env,
@@ -5122,7 +5122,7 @@ fn test_no_milestone_unlock_event_when_call_fails() {
     // discard buffered events, so this is verified by the absence of the
     // event after the panic is caught.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-UNLOCK-FAIL");
     create_standard_engagement(
         &env,
@@ -5151,7 +5151,7 @@ fn test_no_milestone_unlock_event_when_call_fails() {
 #[test]
 fn test_milestone_cap_at_cap() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mut milestones = Vec::new(&env);
     for i in 0..10 {
@@ -5206,7 +5206,7 @@ fn test_milestone_cap_at_cap() {
 #[should_panic(expected = "TooManyMilestones")]
 fn test_milestone_cap_over_cap() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mut milestones = Vec::new(&env);
     for i in 0..11 {
@@ -5260,7 +5260,7 @@ fn test_milestone_cap_over_cap() {
 #[should_panic(expected = "ZeroMilestones")]
 fn test_milestone_cap_zero_milestones() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-0-MILESTONES"),
@@ -5288,7 +5288,7 @@ fn test_milestone_cap_zero_milestones() {
 #[test]
 fn test_milestone_name_64_char_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let name_64 = String::from_str(
         &env,
@@ -5331,7 +5331,7 @@ fn test_milestone_name_64_char_accepted() {
 #[should_panic(expected = "MilestoneNameTooLong: index 0")]
 fn test_milestone_name_65_char_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let name_65 = String::from_str(
         &env,
@@ -5374,7 +5374,7 @@ fn test_milestone_name_65_char_rejected() {
 #[should_panic(expected = "MilestoneNameEmpty: index 0")]
 fn test_milestone_name_empty_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let milestones = vec![
         &env,
@@ -5413,7 +5413,7 @@ fn test_milestone_name_empty_rejected() {
 #[should_panic(expected = "MilestoneNameTooLong: index 1")]
 fn test_milestone_name_multi_milestone_partial_failure() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let name_65 = String::from_str(
         &env,
@@ -5470,7 +5470,7 @@ fn test_milestone_name_multi_milestone_partial_failure() {
 #[test]
 fn test_milestone_name_uniqueness_happy_path() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let milestones = vec![
         &env,
@@ -5520,7 +5520,7 @@ fn test_milestone_name_uniqueness_happy_path() {
 #[should_panic(expected = "DuplicateMilestoneName: Duplicate Milestone")]
 fn test_milestone_name_uniqueness_duplicate_detection() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let milestones = vec![
         &env,
@@ -5569,7 +5569,7 @@ fn test_milestone_name_uniqueness_duplicate_detection() {
 #[test]
 fn test_milestone_name_uniqueness_case_sensitivity() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let milestones = vec![
         &env,
@@ -5623,7 +5623,7 @@ fn test_milestone_name_uniqueness_case_sensitivity() {
 #[should_panic(expected = "JobTitleEmpty")]
 fn test_job_title_empty_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-TITLE-EMPTY"),
@@ -5646,7 +5646,7 @@ fn test_job_title_empty_rejected() {
 #[test]
 fn test_job_title_64_char_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let title_64 = String::from_str(
         &env,
@@ -5675,7 +5675,7 @@ fn test_job_title_64_char_accepted() {
 #[should_panic(expected = "JobTitleTooLong")]
 fn test_job_title_65_char_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let title_65 = String::from_str(
         &env,
@@ -5708,7 +5708,7 @@ fn test_job_title_65_char_rejected() {
 #[test]
 fn test_max_active_per_company_default() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     assert_eq!(client.get_max_active_per_company(), 50);
 }
 
@@ -5716,7 +5716,7 @@ fn test_max_active_per_company_default() {
 #[test]
 fn test_set_max_active_per_company_admin_update() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_max_active_per_company(&company, &10u32);
     assert_eq!(client.get_max_active_per_company(), 10);
@@ -5731,7 +5731,7 @@ fn test_set_max_active_per_company_admin_update() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_max_active_per_company_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_max_active_per_company(&recruiter, &10u32);
 }
 
@@ -5740,7 +5740,7 @@ fn test_set_max_active_per_company_non_admin_rejected() {
 #[should_panic(expected = "InvalidMaxActivePerCompany")]
 fn test_set_max_active_per_company_zero_rejected() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_max_active_per_company(&company, &0u32);
 }
 
@@ -5748,7 +5748,7 @@ fn test_set_max_active_per_company_zero_rejected() {
 #[test]
 fn test_company_active_count_tracks_creations() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_company_active_count(&company), 0);
 
@@ -5779,7 +5779,7 @@ fn test_company_active_count_tracks_creations() {
 #[test]
 fn test_engagement_accepted_under_cap() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set a cap of 3 and create 3 engagements — all must succeed.
     client.set_max_active_per_company(&company, &3u32);
@@ -5820,7 +5820,7 @@ fn test_engagement_accepted_under_cap() {
 #[should_panic(expected = "CompanyActiveLimitReached")]
 fn test_engagement_rejected_at_cap() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Cap of 2: first two succeed, third panics.
     client.set_max_active_per_company(&company, &2u32);
@@ -5859,7 +5859,7 @@ fn test_engagement_rejected_at_cap() {
 #[test]
 fn test_cap_is_per_company_isolated() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Give company2 its own minted balance.
     let token_admin = Address::generate(&env);
@@ -5909,7 +5909,7 @@ fn test_cap_is_per_company_isolated() {
 #[test]
 fn test_completion_frees_slot() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Cap of 1: only one active engagement allowed at a time.
     client.set_max_active_per_company(&company, &1u32);
@@ -6003,7 +6003,7 @@ fn test_completion_frees_slot() {
 #[test]
 fn test_cancellation_frees_slot() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_max_active_per_company(&company, &1u32);
 
@@ -6040,7 +6040,7 @@ fn test_cancellation_frees_slot() {
 #[test]
 fn test_admin_increasing_cap_allows_more_engagements() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_max_active_per_company(&company, &1u32);
 
@@ -6085,7 +6085,7 @@ fn test_admin_increasing_cap_allows_more_engagements() {
 #[test]
 fn test_admin_decreasing_cap_blocks_new_while_over() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Start with cap of 3, create 2 engagements.
     client.set_max_active_per_company(&company, &3u32);
@@ -6134,7 +6134,7 @@ fn test_admin_decreasing_cap_blocks_new_while_over() {
 #[test]
 fn test_active_count_default_zero_for_new_company() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let new_company = Address::generate(&env);
     assert_eq!(client.get_company_active_count(&new_company), 0);
 }
@@ -6148,7 +6148,7 @@ fn test_active_count_default_zero_for_new_company() {
 #[test]
 fn test_get_admin_reflects_init_and_rotation() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_admin(), company);
 
@@ -6169,7 +6169,7 @@ fn test_get_admin_reflects_init_and_rotation() {
 #[should_panic(expected = "engagement is in a terminal state")]
 fn test_nominate_arbiter_after_cancel_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARB-TERM-NOM");
     create_standard_engagement(
         &env,
@@ -6198,7 +6198,7 @@ fn test_nominate_arbiter_after_cancel_rejected() {
 #[should_panic(expected = "engagement is in a terminal state")]
 fn test_claim_arbiter_after_completion_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-ARB-TERM-CLAIM");
     create_standard_engagement(
         &env,
@@ -6262,7 +6262,7 @@ fn test_claim_arbiter_after_completion_rejected() {
 #[should_panic(expected = "CompanyRecruiterCollision")]
 fn test_create_engagement_rejects_company_as_recruiter() {
     let (env, contract_id, token_id, company, _recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-COLLIDE-CR"),
@@ -6286,7 +6286,7 @@ fn test_create_engagement_rejects_company_as_recruiter() {
 #[should_panic(expected = "CompanyArbiterCollision")]
 fn test_create_engagement_rejects_company_as_arbiter() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-COLLIDE-CA"),
@@ -6310,7 +6310,7 @@ fn test_create_engagement_rejects_company_as_arbiter() {
 #[should_panic(expected = "RecruiterArbiterCollision")]
 fn test_create_engagement_rejects_recruiter_as_arbiter() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-COLLIDE-RA"),
@@ -6335,7 +6335,7 @@ fn test_create_engagement_rejects_recruiter_as_arbiter() {
 fn test_create_engagement_rejects_recruiter_as_one_of_several_arbiters() {
     // Collision check must scan the whole arbiter set, not just index 0.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.create_engagement(
         &String::from_str(&env, "ENG-COLLIDE-MULTI"),
@@ -6359,7 +6359,7 @@ fn test_create_engagement_rejects_recruiter_as_one_of_several_arbiters() {
 fn test_create_engagement_allows_distinct_addresses() {
     // Sanity control: distinct company/recruiter/arbiter addresses are unaffected.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_standard_engagement(
         &env,
         &client,
@@ -6378,10 +6378,10 @@ fn test_create_engagement_allows_distinct_addresses() {
 // ============================================================
 
 /// Minimal mock token implementing just enough of the Token interface
-/// (`transfer`, `balance`, `mint`) for HireSettleContract to use it as an
+/// (`transfer`, `balance`, `mint`) for StellarSorterContract to use it as an
 /// escrow asset, plus `decimals()` reporting a non-USDC-like precision (18)
 /// — unlike the 7-decimal Stellar classic asset `setup()` wires up elsewhere
-/// in this suite. HireSettleContract never calls `decimals()` itself; it is
+/// in this suite. StellarSorterContract never calls `decimals()` itself; it is
 /// exposed here purely so the test can state the precision it represents.
 #[contract]
 struct MockToken18;
@@ -6413,7 +6413,7 @@ impl MockToken18 {
 #[test]
 fn test_engagement_payout_math_is_decimal_agnostic_for_18_decimal_token() {
     let (env, contract_id, _token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mock_token_id = env.register(MockToken18, ());
     let mock_client = MockToken18Client::new(&env, &mock_token_id);
@@ -6465,7 +6465,7 @@ fn test_min_amount_is_raw_units_not_scaled_per_token_decimals() {
     // represents "0.01 USDC" worth of real value — it is up to the integrator
     // to call `set_min_amount` appropriately per token precision.
     let (env, contract_id, _token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mock_token_id = env.register(MockToken18, ());
     let mock_client = MockToken18Client::new(&env, &mock_token_id);
@@ -6505,7 +6505,7 @@ fn test_min_amount_is_raw_units_not_scaled_per_token_decimals() {
 #[test]
 fn test_request_replacement_clears_in_flight_dispute_on_retention_milestone() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
@@ -6617,7 +6617,7 @@ fn test_request_replacement_clears_in_flight_dispute_on_retention_milestone() {
 #[test]
 fn test_top_up_escrow_increases_balance() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-TOPUP-OK");
     create_standard_engagement(
         &env,
@@ -6640,7 +6640,7 @@ fn test_top_up_escrow_increases_balance() {
 #[should_panic(expected = "unauthorized")]
 fn test_top_up_escrow_non_company_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-TOPUP-NONCO");
     create_standard_engagement(
         &env,
@@ -6658,7 +6658,7 @@ fn test_top_up_escrow_non_company_rejected() {
 #[test]
 fn test_top_up_escrow_emits_event_with_correct_payload() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-TOPUP-EVT");
     create_standard_engagement(
         &env,
@@ -6693,7 +6693,7 @@ fn test_top_up_escrow_emits_event_with_correct_payload() {
 #[should_panic(expected = "amount must be greater than zero")]
 fn test_top_up_escrow_zero_amount_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-TOPUP-ZERO");
     create_standard_engagement(
         &env,
@@ -6712,7 +6712,7 @@ fn test_top_up_escrow_zero_amount_rejected() {
 #[should_panic(expected = "amount must be greater than zero")]
 fn test_top_up_escrow_negative_amount_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-TOPUP-NEG");
     create_standard_engagement(
         &env,
@@ -6734,7 +6734,7 @@ fn test_top_up_escrow_negative_amount_rejected() {
 #[test]
 fn test_set_min_amount_admin_updates_floor() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let new_min = 5_000_000;
     client.set_min_amount(&company, &new_min);
@@ -6746,7 +6746,7 @@ fn test_set_min_amount_admin_updates_floor() {
 #[should_panic(expected = "AmountBelowMinimum")]
 fn test_create_engagement_below_updated_min_amount_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let new_min = 5_000_000;
     client.set_min_amount(&company, &new_min);
@@ -6773,7 +6773,7 @@ fn test_create_engagement_below_updated_min_amount_rejected() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_min_amount_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_min_amount(&recruiter, &5_000_000);
 }
@@ -6786,7 +6786,7 @@ fn test_set_min_amount_non_admin_rejected() {
 #[test]
 fn test_get_upgrade_lock_duration_default() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     assert_eq!(client.get_upgrade_lock_duration(), 17_280);
 }
 
@@ -6794,7 +6794,7 @@ fn test_get_upgrade_lock_duration_default() {
 #[test]
 fn test_set_upgrade_lock_duration_admin_update() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_upgrade_lock_duration(&company, &5_000u32);
     assert_eq!(client.get_upgrade_lock_duration(), 5_000);
@@ -6808,7 +6808,7 @@ fn test_set_upgrade_lock_duration_admin_update() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_upgrade_lock_duration_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_upgrade_lock_duration(&recruiter, &5_000u32);
 }
 
@@ -6817,7 +6817,7 @@ fn test_set_upgrade_lock_duration_non_admin_rejected() {
 #[should_panic(expected = "unauthorized")]
 fn test_propose_upgrade_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let wasm_hash = soroban_sdk::BytesN::from_array(&env, &[1u8; 32]);
     client.propose_upgrade(&recruiter, &wasm_hash);
 }
@@ -6827,7 +6827,7 @@ fn test_propose_upgrade_non_admin_rejected() {
 #[should_panic(expected = "no pending upgrade")]
 fn test_execute_upgrade_no_pending_proposal_panics() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.execute_upgrade();
 }
 
@@ -6836,7 +6836,7 @@ fn test_execute_upgrade_no_pending_proposal_panics() {
 #[should_panic(expected = "UpgradeLockNotElapsed")]
 fn test_execute_upgrade_before_lock_elapses_rejected() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set lock to 500 ledgers so we can control timing precisely.
     client.set_upgrade_lock_duration(&company, &500u32);
@@ -6857,7 +6857,7 @@ fn test_execute_upgrade_before_lock_elapses_rejected() {
 #[test]
 fn test_propose_upgrade_emits_event_and_sets_proposal() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Use a 100-ledger lock for a predictable execute_after_ledger.
     client.set_upgrade_lock_duration(&company, &100u32);
@@ -6882,7 +6882,7 @@ fn test_propose_upgrade_emits_event_and_sets_proposal() {
 #[should_panic(expected = "UpgradeLockNotElapsed")]
 fn test_propose_upgrade_overwrites_pending_proposal_and_resets_lock() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Lock = 200 ledgers (execute_after_ledger = 100 + 200 = 300)
     client.set_upgrade_lock_duration(&company, &200u32);
@@ -6906,7 +6906,7 @@ fn test_propose_upgrade_overwrites_pending_proposal_and_resets_lock() {
 #[should_panic(expected = "UpgradeLockNotElapsed")]
 fn test_updated_lock_duration_applies_to_new_proposal() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Change to a long lock: 10_000 ledgers.
     client.set_upgrade_lock_duration(&company, &10_000u32);
@@ -6929,7 +6929,7 @@ fn test_updated_lock_duration_applies_to_new_proposal() {
 #[test]
 fn test_recruiter_transfer_happy_path() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let new_recruiter = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-RTR-01");
 
@@ -6955,7 +6955,7 @@ fn test_recruiter_transfer_happy_path() {
 #[should_panic(expected = "unauthorized")]
 fn test_recruiter_transfer_wrong_proposer() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let new_recruiter = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-RTR-WP");
 
@@ -6977,7 +6977,7 @@ fn test_recruiter_transfer_wrong_proposer() {
 #[should_panic(expected = "unauthorized")]
 fn test_recruiter_transfer_wrong_acceptor() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let new_recruiter = Address::generate(&env);
     let stranger = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-RTR-WA");
@@ -7000,7 +7000,7 @@ fn test_recruiter_transfer_wrong_acceptor() {
 #[test]
 fn test_recruiter_transfer_payout() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let new_recruiter = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-RTR-PO");
@@ -7041,7 +7041,7 @@ fn test_recruiter_transfer_payout() {
 #[should_panic(expected = "no pending recruiter transfer")]
 fn test_recruiter_transfer_no_proposal() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-RTR-NP");
 
     create_standard_engagement(
@@ -7061,7 +7061,7 @@ fn test_recruiter_transfer_no_proposal() {
 #[test]
 fn test_recruiter_transfer_event() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let new_recruiter = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-RTR-EVT");
 
@@ -7106,7 +7106,7 @@ fn test_get_arbiter_votes_default_before_any_votes() {
     // Before a dispute is raised (or before any vote is cast), get_arbiter_votes
     // must return zeroed counts rather than panicking.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-AVOTES-EMPTY");
 
     create_standard_engagement(
@@ -7131,7 +7131,7 @@ fn test_get_arbiter_votes_default_before_any_votes() {
 #[test]
 fn test_multi_arbiter_quorum_with_three_arbiters_and_quorum_two() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -7209,7 +7209,7 @@ fn test_multi_arbiter_quorum_with_three_arbiters_and_quorum_two() {
 fn test_expire_engagement_rejected_on_completed_engagement() {
     // An already-completed engagement must not be expirable.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-EXPIRE-DONE");
@@ -7277,7 +7277,7 @@ fn test_expire_engagement_rejected_on_cancelled_engagement_before_timeout() {
     // the contract only gates on Completed for the status check; the timeout
     // guard fires first when the window hasn't elapsed.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-EXPIRE-CANC");
     create_standard_engagement(
@@ -7302,7 +7302,7 @@ fn test_expire_engagement_rejected_on_cancelled_engagement_before_timeout() {
 #[test]
 fn test_set_and_get_arbiter_fee() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Default is 0
     assert_eq!(client.get_arbiter_fee(), 0u32);
@@ -7321,7 +7321,7 @@ fn test_set_and_get_arbiter_fee() {
 #[test]
 fn test_set_arbiter_fee_too_high_rejected() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let result = client.try_set_arbiter_fee(&company, &201u32);
     assert!(result.is_err());
@@ -7335,7 +7335,7 @@ fn test_set_arbiter_fee_too_high_rejected() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_set_arbiter_fee() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_arbiter_fee(&recruiter, &50u32);
 }
@@ -7345,7 +7345,7 @@ fn test_non_admin_cannot_set_arbiter_fee() {
 #[test]
 fn test_arbiter_fee_deducted_on_dispute_approval() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     // Set arbiter fee to 1% (100 bps)
@@ -7409,7 +7409,7 @@ fn test_arbiter_fee_deducted_on_dispute_approval() {
 #[test]
 fn test_recruiter_cosigner_can_submit_proof_and_cancel() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -7444,7 +7444,7 @@ fn test_recruiter_cosigner_can_submit_proof_and_cancel() {
 #[should_panic(expected = "unauthorized")]
 fn test_unknown_wallet_cannot_submit_proof_without_recruiter_cosigner() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -7469,7 +7469,7 @@ fn test_unknown_wallet_cannot_submit_proof_without_recruiter_cosigner() {
 #[test]
 fn test_company_cosigner_can_confirm_milestone() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     create_standard_engagement(
@@ -7503,7 +7503,7 @@ fn test_company_cosigner_can_confirm_milestone() {
 #[should_panic(expected = "unauthorized")]
 fn test_stranger_cannot_confirm_milestone_when_company_cosigner_set() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -7535,7 +7535,7 @@ fn test_stranger_cannot_confirm_milestone_when_company_cosigner_set() {
 #[should_panic(expected = "unauthorized")]
 fn test_reregistering_company_cosigner_revokes_previous_cosigner() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -7568,7 +7568,7 @@ fn test_reregistering_company_cosigner_revokes_previous_cosigner() {
 #[test]
 fn test_escrow_callback_checkpoint_disabled_by_default() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env,
@@ -7596,7 +7596,7 @@ fn test_escrow_callback_checkpoint_disabled_by_default() {
 #[should_panic(expected = "engagement not found")]
 fn test_nominate_arbiter_on_nonexistent_engagement_rejected() {
     let (env, contract_id, _token_id, _company, _recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let new_arbiter = Address::generate(&env);
     let fake_eng_id = String::from_str(&env, "ENG-DOES-NOT-EXIST");
@@ -7608,7 +7608,7 @@ fn test_nominate_arbiter_on_nonexistent_engagement_rejected() {
 #[test]
 fn test_multiple_companies_independent_active_counts() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Setup second company with its own token
     let token_admin2 = Address::generate(&env);
@@ -7653,7 +7653,7 @@ fn test_multiple_companies_independent_active_counts() {
 #[test]
 fn test_force_confirm_milestone_event_contains_correct_data() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_confirm_window(&company, &100u32);
 
@@ -7700,7 +7700,7 @@ fn test_force_confirm_milestone_event_contains_correct_data() {
 #[test]
 fn test_co_recruiter_split_with_platform_fee() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
     let co_recruiter = Address::generate(&env);
@@ -7769,7 +7769,7 @@ fn test_co_recruiter_split_with_platform_fee() {
 #[test]
 fn test_replacement_preserves_milestone_structure_after_multi_confirms() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "ENG-REPL-STRUCT");
@@ -7827,7 +7827,7 @@ fn test_replacement_preserves_milestone_structure_after_multi_confirms() {
 #[test]
 fn test_batch_get_engagement_summary_filters_invalid_ids() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "BATCH-V1",
@@ -7862,7 +7862,7 @@ fn test_batch_get_engagement_summary_filters_invalid_ids() {
 #[test]
 fn test_proof_cooldown_reset_after_multiple_dispute_cycles() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set a short cooldown for testing
     client.set_proof_cooldown(&company, &10u32);
@@ -7922,7 +7922,7 @@ fn test_proof_cooldown_reset_after_multiple_dispute_cycles() {
 #[test]
 fn test_estimated_unlock_seconds_at_exact_unlock_time() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = String::from_str(&env, "ENG-UNLOCK-EXACT");
     create_standard_engagement(
@@ -7955,7 +7955,7 @@ fn test_estimated_unlock_seconds_at_exact_unlock_time() {
 #[should_panic(expected = "DisputeWindowClosed")]
 fn test_dispute_window_closes_at_exact_boundary_plus_one() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_dispute_window(&company, &100u32);
 
@@ -7988,7 +7988,7 @@ fn test_dispute_window_closes_at_exact_boundary_plus_one() {
 #[should_panic(expected = "TokenNotAllowed")]
 fn test_token_allowlist_rejects_second_token_when_only_first_allowed() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Setup second token
     let token_admin2 = Address::generate(&env);
@@ -8027,7 +8027,7 @@ fn test_token_allowlist_rejects_second_token_when_only_first_allowed() {
 #[should_panic(expected = "CompanyActiveLimitReached")]
 fn test_max_active_per_company_enforces_exact_limit() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set limit to 2
     client.set_max_active_per_company(&company, &2u32);
@@ -8070,7 +8070,7 @@ fn test_max_active_per_company_enforces_exact_limit() {
 #[test]
 fn test_arbiter_votes_reach_quorum_in_different_order() {
     let (env, contract_id, token_id, company, recruiter, _) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let a1 = Address::generate(&env);
@@ -8121,7 +8121,7 @@ fn test_arbiter_votes_reach_quorum_in_different_order() {
 #[test]
 fn test_co_recruiter_split_with_odd_percentage_remainder() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let co_recruiter = Address::generate(&env);
 
@@ -8185,7 +8185,7 @@ fn test_co_recruiter_split_with_odd_percentage_remainder() {
 #[test]
 fn test_force_confirm_callable_by_any_address() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     client.set_confirm_window(&company, &100u32);
@@ -8220,7 +8220,7 @@ fn test_force_confirm_callable_by_any_address() {
 #[test]
 fn test_platform_fee_and_arbiter_fee_both_deducted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -8263,7 +8263,7 @@ fn test_platform_fee_and_arbiter_fee_both_deducted() {
 #[test]
 fn test_get_engagements_by_company_pagination_boundary() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Create exactly 10 engagements
     for i in 0..10 {
@@ -8305,7 +8305,7 @@ fn test_get_engagements_by_company_pagination_boundary() {
 #[should_panic(expected = "milestone percentages must sum to 100")]
 fn test_create_engagement_rejects_99_percent_total() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let bad_milestones = vec![
         &env,
@@ -8359,7 +8359,7 @@ fn test_create_engagement_rejects_99_percent_total() {
 #[test]
 fn test_remove_fee_tier_deletes_single_tier() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set up three tiers
     let tiers = vec![
@@ -8398,7 +8398,7 @@ fn test_remove_fee_tier_deletes_single_tier() {
 #[should_panic(expected = "fee tier not found")]
 fn test_remove_fee_tier_nonexistent_panics() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set up one tier
     let tiers = vec![
@@ -8419,7 +8419,7 @@ fn test_remove_fee_tier_nonexistent_panics() {
 #[test]
 fn test_remove_fee_tier_last_tier_empties_list() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set up one tier
     let tiers = vec![
@@ -8445,7 +8445,7 @@ fn test_remove_fee_tier_last_tier_empties_list() {
 #[should_panic(expected = "unauthorized")]
 fn test_remove_fee_tier_non_admin_rejected() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set up one tier as admin
     let tiers = vec![
@@ -8467,7 +8467,7 @@ fn test_remove_fee_tier_non_admin_rejected() {
 #[should_panic(expected = "fee tier not found")]
 fn test_remove_fee_tier_from_empty_list_panics() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // No tiers set - try to remove one
     client.remove_fee_tier(&company, &1_000_000);
@@ -8479,7 +8479,7 @@ fn test_remove_fee_tier_from_empty_list_panics() {
 
 fn create_short_retention_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -8509,7 +8509,7 @@ fn create_short_retention_engagement(
 #[should_panic(expected = "NoShowDisabled")]
 fn test_no_show_disabled_by_default() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "NS-1", &default_config(),
     );
@@ -8522,7 +8522,7 @@ fn test_no_show_disabled_by_default() {
 #[should_panic(expected = "NoShowDeadlineNotReached")]
 fn test_no_show_panics_before_deadline() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_no_show_deadline_ledgers(&company, &100);
     assert_eq!(client.get_no_show_deadline_ledgers(), 100);
     let id = create_short_retention_engagement(
@@ -8537,7 +8537,7 @@ fn test_no_show_panics_before_deadline() {
 #[should_panic(expected = "milestone is not pending")]
 fn test_no_show_panics_on_submitted_milestone() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_no_show_deadline_ledgers(&company, &100);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "NS-3", &default_config(),
@@ -8551,7 +8551,7 @@ fn test_no_show_panics_on_submitted_milestone() {
 #[should_panic(expected = "only placement milestones can be forfeited")]
 fn test_no_show_panics_on_retention_milestone() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_no_show_deadline_ledgers(&company, &100);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "NS-4", &default_config(),
@@ -8564,7 +8564,7 @@ fn test_no_show_panics_on_retention_milestone() {
 #[test]
 fn test_no_show_forfeits_share_to_company_refund_path() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     client.set_no_show_deadline_ledgers(&company, &100);
     let id = create_short_retention_engagement(
@@ -8591,7 +8591,7 @@ fn test_no_show_forfeits_share_to_company_refund_path() {
 #[test]
 fn test_no_show_share_excluded_from_recruiter_payout_on_completion() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     client.set_no_show_deadline_ledgers(&company, &100);
     let id = create_short_retention_engagement(
@@ -8623,7 +8623,7 @@ fn test_no_show_share_excluded_from_recruiter_payout_on_completion() {
 #[test]
 fn test_no_show_clock_restarts_after_rejected_dispute() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_no_show_deadline_ledgers(&company, &100);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "NS-7", &default_config(),
@@ -8657,7 +8657,7 @@ fn stream_config(duration: u32) -> EngagementConfig {
 #[test]
 fn test_unstreamed_milestone_pays_lump_sum() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ST-1", &default_config(),
@@ -8672,7 +8672,7 @@ fn test_unstreamed_milestone_pays_lump_sum() {
 #[test]
 fn test_streamed_milestone_vests_linearly() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ST-2", &stream_config(1_000),
@@ -8705,7 +8705,7 @@ fn test_streamed_milestone_vests_linearly() {
 #[test]
 fn test_streamed_payout_rounds_down_and_pays_exact_remainder() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ST-3", &stream_config(7),
@@ -8725,7 +8725,7 @@ fn test_streamed_payout_rounds_down_and_pays_exact_remainder() {
 #[test]
 fn test_streamed_payout_is_permissionless_but_pays_recruiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ST-4", &stream_config(10),
@@ -8743,7 +8743,7 @@ fn test_streamed_payout_is_permissionless_but_pays_recruiter() {
 #[should_panic(expected = "unauthorized")]
 fn test_streamed_payout_rejects_non_recruiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let id = create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ST-5", &stream_config(10),
     );
@@ -8756,7 +8756,7 @@ fn test_streamed_payout_rejects_non_recruiter() {
 #[should_panic(expected = "InvalidStreamDuration")]
 fn test_zero_stream_duration_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_short_retention_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ST-6", &stream_config(0),
     );
@@ -8768,7 +8768,7 @@ fn test_zero_stream_duration_rejected() {
 
 fn create_random_panel_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -8793,7 +8793,7 @@ fn create_random_panel_engagement(
 #[test]
 fn test_arbiter_pool_add_remove() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let a = Address::generate(&env);
     let b = Address::generate(&env);
     client.add_arbiter_pool_member(&company, &a);
@@ -8809,7 +8809,7 @@ fn test_arbiter_pool_add_remove() {
 #[should_panic(expected = "AlreadyInPool")]
 fn test_arbiter_pool_rejects_duplicate() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let a = Address::generate(&env);
     client.add_arbiter_pool_member(&company, &a);
     client.add_arbiter_pool_member(&company, &a);
@@ -8818,7 +8818,7 @@ fn test_arbiter_pool_rejects_duplicate() {
 #[test]
 fn test_random_panel_is_distinct_and_drawn_from_pool() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     for _ in 0..6 {
         client.add_arbiter_pool_member(&company, &Address::generate(&env));
     }
@@ -8851,7 +8851,7 @@ fn test_random_panel_is_distinct_and_drawn_from_pool() {
 #[should_panic(expected = "ArbiterPoolTooSmall")]
 fn test_random_panel_panics_when_pool_too_small() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.add_arbiter_pool_member(&company, &Address::generate(&env));
     client.add_arbiter_pool_member(&company, &Address::generate(&env));
     create_random_panel_engagement(&env, &client, &token_id, &company, &recruiter, "RP-X", 3, 1);
@@ -8860,7 +8860,7 @@ fn test_random_panel_panics_when_pool_too_small() {
 #[test]
 fn test_random_panel_never_draws_engagement_parties() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let a = Address::generate(&env);
     client.add_arbiter_pool_member(&company, &company);
     client.add_arbiter_pool_member(&company, &a);
@@ -8892,7 +8892,7 @@ fn test_random_panel_never_draws_engagement_parties() {
 /// voted on.
 fn build_arbiter_track_records(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -8925,7 +8925,7 @@ fn build_arbiter_track_records(
 #[test]
 fn test_arbiter_selection_weight_reflects_track_record() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let good = Address::generate(&env);
     let bad = Address::generate(&env);
     let newbie = Address::generate(&env);
@@ -8947,7 +8947,7 @@ fn test_arbiter_selection_weight_reflects_track_record() {
 #[test]
 fn test_weighted_draw_favours_strong_track_record() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let good = Address::generate(&env);
     let bad = Address::generate(&env);
     let newbie = Address::generate(&env);
@@ -8960,7 +8960,7 @@ fn test_weighted_draw_favours_strong_track_record() {
     env.as_contract(&contract_id, || {
         for _ in 0..1_500 {
             let panel =
-                HireSettleContract::draw_arbiter_panel(&env, &pool, 1, &company, &recruiter);
+                StellarSorterContract::draw_arbiter_panel(&env, &pool, 1, &company, &recruiter);
             let drawn = panel.get(0).unwrap();
             if drawn == good {
                 good_n += 1;
@@ -8986,7 +8986,7 @@ fn test_weighted_draw_favours_strong_track_record() {
 #[test]
 fn test_get_version_returns_default_when_unset() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_version(), String::from_str(&env, "0.2.0"));
 }
@@ -8994,7 +8994,7 @@ fn test_get_version_returns_default_when_unset() {
 #[test]
 fn test_set_version_updates_version_and_emits_event() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_version(&company, &String::from_str(&env, "1.0.0"));
 
@@ -9006,7 +9006,7 @@ fn test_set_version_updates_version_and_emits_event() {
 #[should_panic(expected = "VersionTooLong")]
 fn test_set_version_rejects_string_over_32_chars() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // 33 characters — one over MAX_VERSION_LENGTH.
     client.set_version(
@@ -9018,7 +9018,7 @@ fn test_set_version_rejects_string_over_32_chars() {
 #[test]
 fn test_waive_platform_fee_marks_engagement_waived() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-WAIVE",
     );
@@ -9035,7 +9035,7 @@ fn test_waive_platform_fee_marks_engagement_waived() {
 #[should_panic(expected = "unauthorized")]
 fn test_waive_platform_fee_non_admin_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-WAIVE-2",
     );
@@ -9046,7 +9046,7 @@ fn test_waive_platform_fee_non_admin_rejected() {
 #[test]
 fn test_token_min_amount_override_takes_precedence_over_global() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other_token = Address::generate(&env);
 
     assert_eq!(client.get_token_min_amount(&token_id), None);
@@ -9067,7 +9067,7 @@ fn test_token_min_amount_override_takes_precedence_over_global() {
 #[should_panic(expected = "InvalidMinAmount")]
 fn test_set_token_min_amount_rejects_non_positive() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_token_min_amount(&company, &token_id, &0);
 }
@@ -9075,7 +9075,7 @@ fn test_set_token_min_amount_rejects_non_positive() {
 #[test]
 fn test_remove_token_min_amount_falls_back_to_global() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_token_min_amount(&company, &token_id, &5_000_000);
     client.remove_token_min_amount(&company, &token_id);
@@ -9088,7 +9088,7 @@ fn test_remove_token_min_amount_falls_back_to_global() {
 #[test]
 fn test_add_and_remove_referrer() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let ref_a = Address::generate(&env);
     let ref_b = Address::generate(&env);
 
@@ -9107,7 +9107,7 @@ fn test_add_and_remove_referrer() {
 #[should_panic(expected = "referrer already exists")]
 fn test_add_referrer_rejects_duplicate() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let referrer = Address::generate(&env);
 
     client.add_referrer(&company, &referrer);
@@ -9121,7 +9121,7 @@ fn test_add_referrer_rejects_duplicate() {
 #[test]
 fn test_pool_deposit_create_withdraw_roundtrip() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let deposit = 5_000_000_000i128;
@@ -9160,7 +9160,7 @@ fn test_pool_deposit_create_withdraw_roundtrip() {
 #[should_panic(expected = "InsufficientCompanyBalance")]
 fn test_pool_funded_create_insufficient_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.deposit_company_balance(&company, &token_id, &500_000_000);
     let before = client.get_company_balance(&company, &token_id);
@@ -9190,7 +9190,7 @@ fn test_pool_funded_create_insufficient_panics() {
 #[test]
 fn test_pool_insufficient_does_not_consume_balance() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.deposit_company_balance(&company, &token_id, &500_000_000);
     assert_eq!(client.get_company_balance(&company, &token_id), 500_000_000);
@@ -9222,7 +9222,7 @@ fn test_pool_insufficient_does_not_consume_balance() {
 #[test]
 fn test_non_pool_funded_create_still_transfers() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let before = token_client.balance(&company);
@@ -9236,7 +9236,7 @@ fn test_non_pool_funded_create_still_transfers() {
 #[test]
 fn test_cosigner_default_off_setters_apply_immediately() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let treasury = Address::generate(&env);
 
     assert!(client.get_config_cosigner().is_none());
@@ -9247,7 +9247,7 @@ fn test_cosigner_default_off_setters_apply_immediately() {
 #[test]
 fn test_sensitive_setter_requires_cosigner_accept() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let cosigner = Address::generate(&env);
     let treasury = Address::generate(&env);
     let treasury2 = Address::generate(&env);
@@ -9271,7 +9271,7 @@ fn test_sensitive_setter_requires_cosigner_accept() {
 #[test]
 fn test_non_sensitive_setter_applies_with_cosigner() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let cosigner = Address::generate(&env);
 
     client.set_config_cosigner(&company, &Some(cosigner));
@@ -9284,7 +9284,7 @@ fn test_non_sensitive_setter_applies_with_cosigner() {
 #[test]
 fn test_emergency_pause_threshold_and_duplicate() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let s1 = Address::generate(&env);
     let s2 = Address::generate(&env);
     let s3 = Address::generate(&env);
@@ -9307,7 +9307,7 @@ fn test_emergency_pause_threshold_and_duplicate() {
 #[should_panic(expected = "already voted")]
 fn test_emergency_duplicate_vote_rejected() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let s1 = Address::generate(&env);
     let s2 = Address::generate(&env);
 
@@ -9320,7 +9320,7 @@ fn test_emergency_duplicate_vote_rejected() {
 #[should_panic(expected = "unauthorized")]
 fn test_emergency_cannot_unpause() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let s1 = Address::generate(&env);
     let s2 = Address::generate(&env);
 
@@ -9335,7 +9335,7 @@ fn test_emergency_cannot_unpause() {
 #[test]
 fn test_fee_rebate_default_zero_unchanged() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -9360,7 +9360,7 @@ fn test_fee_rebate_default_zero_unchanged() {
 #[test]
 fn test_fee_rebate_credits_and_offsets() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -9401,7 +9401,7 @@ fn test_fee_rebate_credits_and_offsets() {
 #[test]
 fn test_redeem_company_rebate() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -9426,7 +9426,7 @@ fn test_redeem_company_rebate() {
 #[should_panic(expected = "InsufficientRebateBalance")]
 fn test_redeem_company_rebate_over_balance() {
     let (env, contract_id, token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.redeem_company_rebate(&company, &token_id, &1);
 }
 
@@ -9439,7 +9439,7 @@ fn test_redeem_company_rebate_over_balance() {
 #[test]
 fn test_pause_matrix_both_off_confirm_succeeds() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSE-OK");
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PAUSE-OK",
@@ -9458,7 +9458,7 @@ fn test_pause_matrix_both_off_confirm_succeeds() {
 #[should_panic(expected = "EngagementPaused")]
 fn test_pause_matrix_engagement_on_confirm_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSE-ENG");
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PAUSE-ENG",
@@ -9472,7 +9472,7 @@ fn test_pause_matrix_engagement_on_confirm_panics() {
 #[should_panic(expected = "ContractPaused")]
 fn test_pause_matrix_global_on_confirm_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSE-GLO");
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PAUSE-GLO",
@@ -9486,7 +9486,7 @@ fn test_pause_matrix_global_on_confirm_panics() {
 #[should_panic(expected = "ContractPaused")]
 fn test_pause_matrix_both_on_global_error_first() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSE-BOTH");
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PAUSE-BOTH",
@@ -9501,7 +9501,7 @@ fn test_pause_matrix_both_on_global_error_first() {
 #[should_panic(expected = "EngagementPaused")]
 fn test_pause_matrix_readme_worked_example_stays_quarantined() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-PAUSE-EX");
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PAUSE-EX",
@@ -9523,7 +9523,7 @@ fn test_pause_matrix_readme_worked_example_stays_quarantined() {
 #[test]
 fn test_split_amendment_applies_to_future_not_past() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let co = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-SPLIT-AMD");
@@ -9598,7 +9598,7 @@ fn test_split_amendment_applies_to_future_not_past() {
 #[should_panic(expected = "unauthorized")]
 fn test_split_amendment_proposer_cannot_accept() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let co = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-SPLIT-SELF");
     client.create_engagement(
@@ -9626,7 +9626,7 @@ fn test_split_amendment_proposer_cannot_accept() {
 #[should_panic(expected = "amendment_expired")]
 fn test_split_amendment_expires() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let co = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-SPLIT-TTL");
     client.create_engagement(
@@ -9660,7 +9660,7 @@ fn test_split_amendment_expires() {
 #[test]
 fn test_recruiter_verified_flag_defaults_and_lifecycle() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other = Address::generate(&env);
 
     assert!(!client.is_recruiter_verified(&recruiter));
@@ -9692,7 +9692,7 @@ fn test_recruiter_verified_flag_defaults_and_lifecycle() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_set_recruiter_verified() {
     let (env, contract_id, _token_id, _company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_recruiter_verified(&recruiter, &arbiter, &true);
 }
 
@@ -9704,7 +9704,7 @@ fn test_non_admin_cannot_set_recruiter_verified() {
 #[should_panic(expected = "ArbiterRecused")]
 fn test_recused_arbiter_cannot_vote() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
     let a3 = Address::generate(&env);
@@ -9727,7 +9727,7 @@ fn test_recused_arbiter_cannot_vote() {
 #[test]
 fn test_recuse_arbiter_reject_quorum_and_scope() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let a1 = Address::generate(&env);
     let a2 = Address::generate(&env);
     let a3 = Address::generate(&env);
@@ -9797,7 +9797,7 @@ fn test_recuse_arbiter_reject_quorum_and_scope() {
 #[test]
 fn test_remove_token_min_amount_reverts_to_global_floor() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let global_min: i128 = 2_000_000;
     let token_min: i128 = 8_000_000;
@@ -9876,7 +9876,7 @@ fn test_remove_token_min_amount_reverts_to_global_floor() {
 #[test]
 fn test_rating_attributed_to_incoming_recruiter_after_transfer() {
     let (env, contract_id, token_id, company, original_recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let incoming_recruiter = Address::generate(&env);
     let eng_id = String::from_str(&env, "ENG-RATE-XFER");
 
@@ -9979,7 +9979,7 @@ fn test_rating_attributed_to_incoming_recruiter_after_transfer() {
 #[test]
 fn test_get_public_engagement_ids_excludes_private() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mut public_cfg = default_config();
     public_cfg.is_public = true;
@@ -10113,7 +10113,7 @@ fn tag_of_len(env: &Env, len: u32, fill: char) -> String {
 #[test]
 fn test_create_engagement_max_tag_boundary_and_dedup() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Exactly 10 tags of exactly 32 characters each — the max allowed combination.
     let mut tags = Vec::new(&env);
@@ -10182,7 +10182,7 @@ fn test_create_engagement_max_tag_boundary_and_dedup() {
 #[should_panic(expected = "TooManyTags")]
 fn test_create_engagement_eleven_tags_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mut tags = Vec::new(&env);
     for i in 0u32..11u32 {
@@ -10216,7 +10216,7 @@ fn test_create_engagement_eleven_tags_rejected() {
 #[should_panic(expected = "TagTooLong")]
 fn test_create_engagement_tag_33_chars_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mut cfg = default_config();
     cfg.tags = Some(vec![&env, tag_of_len(&env, 33, 'x')]);
@@ -10243,7 +10243,7 @@ fn test_create_engagement_tag_33_chars_rejected() {
 #[should_panic(expected = "TagEmpty")]
 fn test_create_engagement_empty_tag_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let mut cfg = default_config();
     cfg.tags = Some(vec![&env, String::from_str(&env, "")]);
@@ -10274,7 +10274,7 @@ fn test_create_engagement_empty_tag_rejected() {
 #[test]
 fn test_top_up_escrow_increases_total_and_balance() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     create_standard_engagement(
@@ -10302,7 +10302,7 @@ fn test_top_up_escrow_increases_total_and_balance() {
 #[should_panic(expected = "unauthorized")]
 fn test_top_up_escrow_by_stranger_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-TOPUP-X",
@@ -10320,7 +10320,7 @@ fn test_top_up_escrow_by_stranger_rejected() {
 #[should_panic(expected = "InvalidProofHash")]
 fn test_submit_proof_empty_hash_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-EMPTY-PROOF",
@@ -10338,7 +10338,7 @@ fn test_submit_proof_empty_hash_rejected() {
 #[should_panic(expected = "ContractPaused")]
 fn test_submit_proof_blocked_while_contract_paused() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PAUSED",
@@ -10359,7 +10359,7 @@ fn test_submit_proof_blocked_while_contract_paused() {
 #[test]
 fn test_unlock_progress_and_statuses_track_unlocks() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PROGRESS",
@@ -10388,7 +10388,7 @@ fn test_unlock_progress_and_statuses_track_unlocks() {
 #[should_panic(expected = "engagement already exists")]
 fn test_create_engagement_duplicate_id_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-DUP",
@@ -10406,7 +10406,7 @@ fn test_create_engagement_duplicate_id_rejected() {
 /// `quorum` / optional `weights`, returning the engagement id.
 fn create_engagement_with_panel(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -10440,7 +10440,7 @@ fn create_engagement_with_panel(
 #[test]
 fn test_min_quorum_ratio_defaults_to_zero() {
     let (env, contract_id, _token_id, _company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     assert_eq!(client.get_min_quorum_ratio_bps(), 0);
 }
 
@@ -10449,7 +10449,7 @@ fn test_min_quorum_ratio_default_allows_single_arbiter_quorum_on_large_panel() {
     // Regression: with the default ratio of 0, today's behaviour is unchanged —
     // quorum 1 on a 7-arbiter panel is still accepted.
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let id = create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-DEFAULT", 7, 1, None,
@@ -10461,7 +10461,7 @@ fn test_min_quorum_ratio_default_allows_single_arbiter_quorum_on_large_panel() {
 #[should_panic(expected = "invalid quorum")]
 fn test_min_quorum_ratio_default_still_rejects_zero_quorum() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-ZERO", 3, 0, None,
     );
@@ -10471,7 +10471,7 @@ fn test_min_quorum_ratio_default_still_rejects_zero_quorum() {
 #[should_panic(expected = "invalid quorum")]
 fn test_min_quorum_ratio_default_still_rejects_quorum_above_panel() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-OVER", 3, 4, None,
     );
@@ -10480,7 +10480,7 @@ fn test_min_quorum_ratio_default_still_rejects_quorum_above_panel() {
 #[test]
 fn test_set_min_quorum_ratio_bps_stores_value_and_emits_event() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_min_quorum_ratio_bps(&company, &5_000);
     // Check the event before the getter call, which replaces the event log.
@@ -10492,7 +10492,7 @@ fn test_set_min_quorum_ratio_bps_stores_value_and_emits_event() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_min_quorum_ratio_bps_rejects_non_admin() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&recruiter, &5_000);
 }
 
@@ -10500,7 +10500,7 @@ fn test_set_min_quorum_ratio_bps_rejects_non_admin() {
 #[should_panic(expected = "InvalidQuorumRatio")]
 fn test_set_min_quorum_ratio_bps_rejects_above_10000() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &10_001);
 }
 
@@ -10509,7 +10509,7 @@ fn test_set_min_quorum_ratio_bps_rejects_above_10000() {
 fn test_min_quorum_ratio_rejects_quorum_below_fraction() {
     // 50 % of a 6-arbiter panel requires quorum >= 3; quorum 2 must fail.
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &5_000);
     create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-LOW", 6, 2, None,
@@ -10520,7 +10520,7 @@ fn test_min_quorum_ratio_rejects_quorum_below_fraction() {
 fn test_min_quorum_ratio_accepts_minimum_passing_quorum() {
     // 50 % of a 6-arbiter panel: exactly 3 is the minimum passing quorum.
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &5_000);
     let id = create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-MIN", 6, 3, None,
@@ -10534,7 +10534,7 @@ fn test_min_quorum_ratio_odd_panel_rounds_up_rejects_floor() {
     // Rounding rule: required quorum = ceil(N * bps / 10_000).
     // 50 % of 5 = 2.5 → 3, so quorum 2 (the floor) must be rejected.
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &5_000);
     create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-ODD-LOW", 5, 2, None,
@@ -10545,7 +10545,7 @@ fn test_min_quorum_ratio_odd_panel_rounds_up_rejects_floor() {
 fn test_min_quorum_ratio_odd_panel_rounds_up_accepts_ceiling() {
     // 50 % of 5 = 2.5 → 3 is the minimum passing quorum.
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &5_000);
     let id = create_engagement_with_panel(
         &env, &client, &token_id, &company, &recruiter, "ENG-Q-ODD-OK", 5, 3, None,
@@ -10558,7 +10558,7 @@ fn test_min_quorum_ratio_non_round_ratio_boundary() {
     // 6 667 bps of 3 = 2.0001 → ceil = 3, so a 3-arbiter panel needs
     // unanimity; 6 666 bps of 3 = 1.9998 → ceil = 2.
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_min_quorum_ratio_bps(&company, &6_666);
     create_engagement_with_panel(
@@ -10593,7 +10593,7 @@ fn test_min_quorum_ratio_non_round_ratio_boundary() {
 #[test]
 fn test_min_quorum_ratio_full_requires_unanimity() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &10_000);
 
     let id = create_engagement_with_panel(
@@ -10609,7 +10609,7 @@ fn test_min_quorum_ratio_weighted_panel_uses_total_weight() {
     // required quorum is ceil(2.5) = 3 in weight units, so quorum 2 fails
     // even though it is >= half the headcount (3 arbiters → 1.5).
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_min_quorum_ratio_bps(&company, &5_000);
     create_engagement_with_panel(
         &env,
@@ -10627,7 +10627,7 @@ fn test_min_quorum_ratio_weighted_panel_uses_total_weight() {
 #[test]
 fn test_min_quorum_ratio_reset_to_zero_restores_default_behaviour() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_min_quorum_ratio_bps(&company, &5_000);
     client.set_min_quorum_ratio_bps(&company, &0);
@@ -10653,7 +10653,7 @@ fn test_min_quorum_ratio_reset_to_zero_restores_default_behaviour() {
 /// | 150 | split amendment proposed by the co-recruiter, accepted |
 fn build_timeline_history(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -10722,7 +10722,7 @@ fn timeline_entry(
 #[test]
 fn test_timeline_merges_every_kind_in_ledger_order() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, co) =
         build_timeline_history(&env, &client, &token_id, &company, &recruiter, &arbiter);
 
@@ -10741,7 +10741,7 @@ fn test_timeline_merges_every_kind_in_ledger_order() {
 #[test]
 fn test_timeline_matches_underlying_histories() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, co) =
         build_timeline_history(&env, &client, &token_id, &company, &recruiter, &arbiter);
 
@@ -10804,7 +10804,7 @@ fn test_timeline_matches_underlying_histories() {
 #[test]
 fn test_timeline_empty_for_fresh_and_unknown_engagements() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-TL-EMPTY",
     );
@@ -10826,7 +10826,7 @@ fn test_timeline_empty_for_fresh_and_unknown_engagements() {
 #[test]
 fn test_timeline_pagination() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         build_timeline_history(&env, &client, &token_id, &company, &recruiter, &arbiter);
     let all = client.get_engagement_timeline(&eng_id, &0, &100);
@@ -10855,7 +10855,7 @@ fn test_timeline_pagination() {
 #[test]
 fn test_status_history_records_completion() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "ENG-TL-DONE");
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-TL-DONE", default_config(),
@@ -10884,7 +10884,7 @@ fn test_status_history_records_completion() {
 /// the engagement.
 fn create_single_milestone_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -10925,7 +10925,7 @@ fn create_single_milestone_engagement(
 
 /// Base fee 500 bps with one tier at 300 bps for engagements ≥ 500M, so the
 /// standard 1B engagement resolves to 300 bps at creation.
-fn setup_fee_tiers(env: &Env, client: &HireSettleContractClient, admin: &Address) -> Address {
+fn setup_fee_tiers(env: &Env, client: &StellarSorterContractClient, admin: &Address) -> Address {
     let treasury = Address::generate(env);
     client.set_platform_fee(admin, &500, &treasury);
     client.set_fee_tiers(
@@ -10941,7 +10941,7 @@ fn setup_fee_tiers(env: &Env, client: &HireSettleContractClient, admin: &Address
     treasury
 }
 
-fn lower_fee_tier_to_100(env: &Env, client: &HireSettleContractClient, admin: &Address) {
+fn lower_fee_tier_to_100(env: &Env, client: &StellarSorterContractClient, admin: &Address) {
     client.set_fee_tiers(
         admin,
         &vec![
@@ -10956,7 +10956,7 @@ fn lower_fee_tier_to_100(env: &Env, client: &HireSettleContractClient, admin: &A
 
 fn submit_and_confirm_placement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     company: &Address,
     recruiter: &Address,
     id: &str,
@@ -10969,7 +10969,7 @@ fn submit_and_confirm_placement(
 #[test]
 fn test_fee_tier_default_tracks_live_tier_changes() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = setup_fee_tiers(&env, &client, &company);
 
@@ -10992,7 +10992,7 @@ fn test_fee_tier_default_tracks_live_tier_changes() {
 #[test]
 fn test_fee_tier_snapshot_ignores_later_tier_changes() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = setup_fee_tiers(&env, &client, &company);
 
@@ -11030,7 +11030,7 @@ fn test_fee_tier_snapshot_ignores_later_tier_changes() {
 #[test]
 fn test_fee_tier_snapshot_freezes_base_rate_when_no_tier_matches() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
     client.set_platform_fee(&company, &500, &treasury);
@@ -11054,7 +11054,7 @@ fn test_fee_tier_snapshot_freezes_base_rate_when_no_tier_matches() {
 #[test]
 fn test_fee_tier_snapshot_composes_with_referral_discount() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = setup_fee_tiers(&env, &client, &company);
     let referrer = Address::generate(&env);
@@ -11090,7 +11090,7 @@ const BOND_FUNDS: i128 = 1_000_000_000;
 /// bonds posted. Returns the funded co-recruiter.
 fn create_co_bonded_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -11114,7 +11114,7 @@ fn create_co_bonded_engagement(
 /// Submit a proof, dispute it, and have the arbiter reject it.
 fn reject_placement_proof(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     company: &Address,
     recruiter: &Address,
     arbiter: &Address,
@@ -11128,7 +11128,7 @@ fn reject_placement_proof(
 #[test]
 fn test_co_bond_ignored_without_co_recruiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CB-NONE");
 
@@ -11150,7 +11150,7 @@ fn test_co_bond_ignored_without_co_recruiter() {
 #[test]
 fn test_co_bond_escrowed_and_returned_on_clean_completion() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CB-CLEAN");
     let co = create_co_bonded_engagement(
@@ -11177,7 +11177,7 @@ fn test_co_bond_escrowed_and_returned_on_clean_completion() {
 #[test]
 fn test_co_bond_forfeits_co_share_on_unresolved_rejection() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CB-FORFEIT");
     let co = create_co_bonded_engagement(
@@ -11205,7 +11205,7 @@ fn test_co_bond_forfeits_co_share_on_unresolved_rejection() {
 #[test]
 fn test_co_bond_forfeit_scales_with_forfeit_bps() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CB-HALF");
     client.set_bond_forfeit_bps(&company, &5_000);
@@ -11224,7 +11224,7 @@ fn test_co_bond_forfeit_scales_with_forfeit_bps() {
 #[test]
 fn test_co_bond_returned_when_rejected_proof_later_confirmed() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CB-RECOVER");
     let co = create_co_bonded_engagement(
@@ -11243,7 +11243,7 @@ fn test_co_bond_returned_when_rejected_proof_later_confirmed() {
 #[test]
 fn test_co_bond_returned_when_rejected_proof_later_approved_by_arbiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = String::from_str(&env, "ENG-CB-APPROVE");
     let co = create_co_bonded_engagement(
@@ -11265,7 +11265,7 @@ fn test_co_bond_returned_when_rejected_proof_later_approved_by_arbiter() {
 #[should_panic(expected = "InvalidBondAmount")]
 fn test_co_bond_rejects_non_positive_amount() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let mut cfg = default_config();
     cfg.co_recruiter = Some(Address::generate(&env));
     cfg.recruiter_split_bps = 7_000;
@@ -11281,7 +11281,7 @@ fn test_co_bond_rejects_non_positive_amount() {
 
 fn create_panel_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -11306,7 +11306,7 @@ fn create_panel_engagement(
 
 fn two_arbiter_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -11333,7 +11333,7 @@ fn two_arbiter_engagement(
 #[test]
 fn test_admin_add_arbiter_keeps_quorum_by_default() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 2);
 
@@ -11349,7 +11349,7 @@ fn test_admin_add_arbiter_keeps_quorum_by_default() {
 #[test]
 fn test_admin_add_arbiter_with_new_quorum_and_new_arbiter_votes() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-GROW",
@@ -11372,7 +11372,7 @@ fn test_admin_add_arbiter_with_new_quorum_and_new_arbiter_votes() {
 #[test]
 fn test_admin_add_arbiter_on_weighted_panel_gets_weight_one() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_panel_engagement(
         &env,
         &client,
@@ -11398,7 +11398,7 @@ fn test_admin_add_arbiter_on_weighted_panel_gets_weight_one() {
 #[should_panic(expected = "DuplicateArbiter")]
 fn test_admin_add_arbiter_rejects_existing_arbiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     client.admin_add_arbiter(&company, &eng_id, &second, &None);
@@ -11408,7 +11408,7 @@ fn test_admin_add_arbiter_rejects_existing_arbiter() {
 #[should_panic(expected = "RecruiterArbiterCollision")]
 fn test_admin_add_arbiter_rejects_recruiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     client.admin_add_arbiter(&company, &eng_id, &recruiter, &None);
@@ -11418,7 +11418,7 @@ fn test_admin_add_arbiter_rejects_recruiter() {
 #[should_panic(expected = "invalid quorum")]
 fn test_admin_add_arbiter_rejects_unreachable_new_quorum() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     client.admin_add_arbiter(&company, &eng_id, &Address::generate(&env), &Some(4));
@@ -11428,7 +11428,7 @@ fn test_admin_add_arbiter_rejects_unreachable_new_quorum() {
 #[should_panic(expected = "unauthorized")]
 fn test_admin_add_arbiter_rejects_non_admin() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     client.admin_add_arbiter(&recruiter, &eng_id, &Address::generate(&env), &None);
@@ -11438,7 +11438,7 @@ fn test_admin_add_arbiter_rejects_non_admin() {
 #[should_panic(expected = "QuorumUnreachable")]
 fn test_admin_remove_arbiter_panics_when_quorum_becomes_unreachable() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 2);
     client.admin_remove_arbiter(&company, &eng_id, &second, &None);
@@ -11447,7 +11447,7 @@ fn test_admin_remove_arbiter_panics_when_quorum_becomes_unreachable() {
 #[test]
 fn test_admin_remove_arbiter_with_reduced_quorum_succeeds() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 2);
 
@@ -11461,7 +11461,7 @@ fn test_admin_remove_arbiter_with_reduced_quorum_succeeds() {
 #[test]
 fn test_admin_remove_arbiter_keeps_reachable_quorum() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
 
@@ -11476,7 +11476,7 @@ fn test_admin_remove_arbiter_keeps_reachable_quorum() {
 #[should_panic(expected = "invalid quorum")]
 fn test_admin_remove_arbiter_rejects_unreachable_new_quorum() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 2);
     client.admin_remove_arbiter(&company, &eng_id, &second, &Some(2));
@@ -11486,7 +11486,7 @@ fn test_admin_remove_arbiter_rejects_unreachable_new_quorum() {
 #[should_panic(expected = "QuorumUnreachable")]
 fn test_admin_remove_arbiter_checks_weighted_quorum() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let heavy = Address::generate(&env);
     let eng_id = create_panel_engagement(
         &env,
@@ -11509,7 +11509,7 @@ fn test_admin_remove_arbiter_checks_weighted_quorum() {
 #[should_panic(expected = "at least one arbiter required")]
 fn test_admin_remove_last_arbiter_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_standard_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-LAST",
     );
@@ -11520,7 +11520,7 @@ fn test_admin_remove_last_arbiter_panics() {
 #[should_panic(expected = "ArbiterNotFound")]
 fn test_admin_remove_unknown_arbiter_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     client.admin_remove_arbiter(&company, &eng_id, &Address::generate(&env), &None);
@@ -11530,7 +11530,7 @@ fn test_admin_remove_unknown_arbiter_panics() {
 #[should_panic(expected = "PanelChangeDuringDispute")]
 fn test_admin_add_arbiter_rejected_during_dispute() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 2);
     client.submit_proof(&recruiter, &eng_id, &0, &String::from_str(&env, "ipfs://p"));
@@ -11542,7 +11542,7 @@ fn test_admin_add_arbiter_rejected_during_dispute() {
 #[should_panic(expected = "PanelChangeDuringDispute")]
 fn test_admin_remove_arbiter_rejected_during_dispute() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     client.submit_proof(&recruiter, &eng_id, &0, &String::from_str(&env, "ipfs://p"));
@@ -11553,7 +11553,7 @@ fn test_admin_remove_arbiter_rejected_during_dispute() {
 #[test]
 fn test_admin_remove_arbiter_clears_its_nomination_and_delegate() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 1);
     let delegate = Address::generate(&env);
@@ -11594,7 +11594,7 @@ fn build_parallel_milestones(env: &Env) -> Vec<Milestone> {
 
 fn create_parallel_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -11622,7 +11622,7 @@ fn create_parallel_engagement(
 /// Submit a distinct proof hash for `index` (proof hashes must be unique).
 fn submit_parallel_proof(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     recruiter: &Address,
     eng_id: &String,
     index: u32,
@@ -11653,7 +11653,7 @@ fn count_events(env: &Env, event_name: &str) -> u32 {
 #[test]
 fn test_batch_raise_dispute_disputes_all_listed_milestones() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-ALL",
@@ -11676,7 +11676,7 @@ fn test_batch_raise_dispute_disputes_all_listed_milestones() {
 #[test]
 fn test_batch_raise_dispute_emits_per_milestone_and_aggregate_events() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-EVT",
@@ -11702,7 +11702,7 @@ fn test_batch_raise_dispute_matches_individual_raise_dispute_state() {
     // other via a sequence of individual raise_dispute calls. Per-milestone
     // stored state must be identical.
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let arbiter_b = Address::generate(&env);
 
     let batch_id = create_parallel_engagement(
@@ -11750,7 +11750,7 @@ fn test_batch_raise_dispute_matches_individual_raise_dispute_state() {
 #[should_panic(expected = "EmptyIndices")]
 fn test_batch_raise_dispute_empty_indices_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-EMPTY",
@@ -11767,7 +11767,7 @@ fn test_batch_raise_dispute_empty_indices_panics() {
 #[should_panic(expected = "can only dispute a submitted proof")]
 fn test_batch_raise_dispute_wrong_status_rejects_batch() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-STATUS",
@@ -11785,7 +11785,7 @@ fn test_batch_raise_dispute_wrong_status_rejects_batch() {
 #[test]
 fn test_batch_raise_dispute_wrong_status_leaves_valid_indices_untouched() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-ATOM-S",
@@ -11812,7 +11812,7 @@ fn test_batch_raise_dispute_wrong_status_leaves_valid_indices_untouched() {
 #[test]
 fn test_batch_raise_dispute_window_closed_rejects_whole_batch() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_dispute_window(&company, &200u32);
 
     let eng_id = create_parallel_engagement(
@@ -11844,7 +11844,7 @@ fn test_batch_raise_dispute_window_closed_rejects_whole_batch() {
 #[should_panic(expected = "DuplicateMilestoneIndex")]
 fn test_batch_raise_dispute_duplicate_index_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-DUP",
@@ -11862,7 +11862,7 @@ fn test_batch_raise_dispute_duplicate_index_panics() {
 #[should_panic(expected = "unauthorized")]
 fn test_batch_raise_dispute_non_company_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-AUTH",
@@ -11880,7 +11880,7 @@ fn test_batch_raise_dispute_non_company_rejected() {
 #[should_panic(expected = "ReasonTooLong")]
 fn test_batch_raise_dispute_reason_too_long_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let eng_id = create_parallel_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-BD-LONG",
@@ -11977,7 +11977,7 @@ fn setup_swap_adapter(env: &Env) -> (Address, Address) {
 /// Submit and confirm milestone 0 (30 % of the standard 1B engagement).
 fn confirm_first_milestone(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     company: &Address,
     recruiter: &Address,
     eng_id: &String,
@@ -11989,7 +11989,7 @@ fn confirm_first_milestone(
 #[test]
 fn test_recruiter_payout_token_set_get_clear() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (_adapter, payout_token) = setup_swap_adapter(&env);
 
     assert_eq!(client.get_recruiter_payout_token(&recruiter), None);
@@ -12005,7 +12005,7 @@ fn test_recruiter_payout_token_set_get_clear() {
 #[test]
 fn test_swap_adapter_set_get_clear() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (adapter, _payout_token) = setup_swap_adapter(&env);
 
     assert_eq!(client.get_swap_adapter(), None);
@@ -12021,7 +12021,7 @@ fn test_swap_adapter_set_get_clear() {
 #[test]
 fn test_payout_swapped_when_preference_and_adapter_set() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (adapter, payout_token) = setup_swap_adapter(&env);
     let adapter_client = MockSwapAdapterClient::new(&env, &adapter);
@@ -12052,7 +12052,7 @@ fn test_payout_swapped_when_preference_and_adapter_set() {
 #[test]
 fn test_payout_swap_applies_to_net_after_platform_fee() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
     let (adapter, payout_token) = setup_swap_adapter(&env);
@@ -12079,7 +12079,7 @@ fn test_payout_swap_applies_to_net_after_platform_fee() {
 #[test]
 fn test_payout_direct_when_preference_set_without_adapter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (_adapter, payout_token) = setup_swap_adapter(&env);
 
@@ -12099,7 +12099,7 @@ fn test_payout_direct_when_preference_set_without_adapter() {
 #[test]
 fn test_payout_direct_when_adapter_set_without_preference() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (adapter, _payout_token) = setup_swap_adapter(&env);
 
@@ -12118,7 +12118,7 @@ fn test_payout_direct_when_adapter_set_without_preference() {
 #[test]
 fn test_payout_direct_when_preference_is_escrow_token() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (adapter, _payout_token) = setup_swap_adapter(&env);
 
@@ -12138,7 +12138,7 @@ fn test_payout_direct_when_preference_is_escrow_token() {
 #[test]
 fn test_clearing_swap_adapter_reverts_to_direct_payout() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (adapter, payout_token) = setup_swap_adapter(&env);
     let adapter_client = MockSwapAdapterClient::new(&env, &adapter);
@@ -12172,7 +12172,7 @@ fn test_clearing_swap_adapter_reverts_to_direct_payout() {
 #[test]
 fn test_clearing_payout_preference_reverts_to_direct_payout() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (adapter, payout_token) = setup_swap_adapter(&env);
     let adapter_client = MockSwapAdapterClient::new(&env, &adapter);
@@ -12207,7 +12207,7 @@ fn test_clearing_payout_preference_reverts_to_direct_payout() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_set_swap_adapter() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (adapter, _payout_token) = setup_swap_adapter(&env);
     client.set_swap_adapter(&recruiter, &adapter);
 }
@@ -12216,7 +12216,7 @@ fn test_non_admin_cannot_set_swap_adapter() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_clear_swap_adapter() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (adapter, _payout_token) = setup_swap_adapter(&env);
     client.set_swap_adapter(&company, &adapter);
     client.clear_swap_adapter(&recruiter);
@@ -12229,7 +12229,7 @@ fn test_non_admin_cannot_clear_swap_adapter() {
 #[test]
 fn test_recruiter_active_cap_set_get_and_remove() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_recruiter_active_cap(&recruiter), None);
     client.set_recruiter_active_cap(&recruiter, &2);
@@ -12243,7 +12243,7 @@ fn test_recruiter_active_cap_set_get_and_remove() {
 #[test]
 fn test_max_active_per_recruiter_set_get() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_max_active_per_recruiter(), 0);
     client.set_max_active_per_recruiter(&company, &3);
@@ -12255,7 +12255,7 @@ fn test_max_active_per_recruiter_set_get() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_set_max_active_per_recruiter() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_max_active_per_recruiter(&recruiter, &3);
 }
 
@@ -12263,7 +12263,7 @@ fn test_non_admin_cannot_set_max_active_per_recruiter() {
 #[should_panic(expected = "RecruiterActiveLimitReached")]
 fn test_recruiter_self_cap_blocks_create_when_reached() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_recruiter_active_cap(&recruiter, &2);
 
     create_engagement_with_id(&env, &client, &token_id, &company, &recruiter, &arbiter, "CAP-1");
@@ -12274,7 +12274,7 @@ fn test_recruiter_self_cap_blocks_create_when_reached() {
 #[test]
 fn test_recruiter_self_cap_allows_up_to_cap_and_ignores_other_recruiters() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let other = Address::generate(&env);
     client.set_recruiter_active_cap(&recruiter, &1);
 
@@ -12306,7 +12306,7 @@ fn test_recruiter_self_cap_allows_up_to_cap_and_ignores_other_recruiters() {
 #[should_panic(expected = "RecruiterActiveLimitReached")]
 fn test_admin_recruiter_cap_blocks_independently() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_max_active_per_recruiter(&company, &1);
     assert_eq!(client.get_recruiter_active_cap(&recruiter), None);
 
@@ -12318,7 +12318,7 @@ fn test_admin_recruiter_cap_blocks_independently() {
 #[should_panic(expected = "RecruiterActiveLimitReached")]
 fn test_stricter_self_cap_wins_over_admin_cap() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_max_active_per_recruiter(&company, &5);
     client.set_recruiter_active_cap(&recruiter, &1);
 
@@ -12330,7 +12330,7 @@ fn test_stricter_self_cap_wins_over_admin_cap() {
 #[should_panic(expected = "RecruiterActiveLimitReached")]
 fn test_stricter_admin_cap_wins_over_self_cap() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_max_active_per_recruiter(&company, &1);
     client.set_recruiter_active_cap(&recruiter, &5);
 
@@ -12341,7 +12341,7 @@ fn test_stricter_admin_cap_wins_over_self_cap() {
 #[test]
 fn test_cancelling_engagement_frees_recruiter_slot() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_recruiter_active_cap(&recruiter, &1);
     client.set_max_active_per_recruiter(&company, &1);
 
@@ -12358,7 +12358,7 @@ fn test_cancelling_engagement_frees_recruiter_slot() {
 #[test]
 fn test_completing_engagement_frees_recruiter_slot() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_recruiter_active_cap(&recruiter, &1);
     client.set_max_active_per_recruiter(&company, &1);
 
@@ -12380,7 +12380,7 @@ fn test_completing_engagement_frees_recruiter_slot() {
 #[test]
 fn test_recruiter_active_cap_requires_recruiter_auth() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_recruiter_active_cap(&recruiter, &3);
     let auths = env.auths();
@@ -12391,7 +12391,7 @@ fn test_recruiter_active_cap_requires_recruiter_auth() {
 #[test]
 fn test_third_party_cannot_set_recruiter_active_cap() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let intruder = Address::generate(&env);
 
     // Only the intruder signs; the cap is keyed by `recruiter`, whose auth is missing.
@@ -12416,7 +12416,7 @@ fn test_third_party_cannot_set_recruiter_active_cap() {
 /// resolution completes the engagement and refunds the withheld remainder.
 fn create_split_vote_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -12454,7 +12454,7 @@ fn create_split_vote_engagement(
 
 fn submit_and_dispute(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     company: &Address,
     recruiter: &Address,
     eng_id: &String,
@@ -12476,7 +12476,7 @@ const COMPANY_START_BALANCE: i128 = 500_000_000_000;
 #[test]
 fn test_split_voting_disabled_by_default_and_toggle() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_split_vote_engagement(
         &env, &client, &token_id, &company, &recruiter, single_arbiter(&env, &arbiter), "SPL-TOG",
     );
@@ -12493,7 +12493,7 @@ fn test_split_voting_disabled_by_default_and_toggle() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_enable_split_voting() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_split_vote_engagement(
         &env, &client, &token_id, &company, &recruiter, single_arbiter(&env, &arbiter), "SPL-NA",
     );
@@ -12504,7 +12504,7 @@ fn test_non_admin_cannot_enable_split_voting() {
 #[should_panic(expected = "SplitVotingDisabled")]
 fn test_split_vote_rejected_when_disabled() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_split_vote_engagement(
         &env, &client, &token_id, &company, &recruiter, single_arbiter(&env, &arbiter), "SPL-OFF",
     );
@@ -12516,7 +12516,7 @@ fn test_split_vote_rejected_when_disabled() {
 #[should_panic(expected = "SplitVotingDisabled")]
 fn test_split_vote_rejected_after_disabling() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_split_vote_engagement(
         &env, &client, &token_id, &company, &recruiter, single_arbiter(&env, &arbiter), "SPL-OFF2",
     );
@@ -12530,7 +12530,7 @@ fn test_split_vote_rejected_after_disabling() {
 #[should_panic(expected = "InvalidSplitPercent")]
 fn test_split_percent_over_100_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_split_vote_engagement(
         &env, &client, &token_id, &company, &recruiter, single_arbiter(&env, &arbiter), "SPL-101",
     );
@@ -12542,7 +12542,7 @@ fn test_split_percent_over_100_panics() {
 #[test]
 fn test_split_percent_boundaries_0_and_100_accepted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let full = create_split_vote_engagement(
@@ -12567,7 +12567,7 @@ fn test_split_percent_boundaries_0_and_100_accepted() {
 #[test]
 fn test_split_vote_resolves_at_quorum_with_exact_amounts() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let second = Address::generate(&env);
     let third = Address::generate(&env);
@@ -12613,7 +12613,7 @@ fn test_split_vote_resolves_at_quorum_with_exact_amounts() {
 #[test]
 fn test_split_vote_withheld_remainder_stays_in_escrow_until_completion() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
 
     let eng_id = String::from_str(&env, "SPL-ESC");
@@ -12636,7 +12636,7 @@ fn test_split_vote_withheld_remainder_stays_in_escrow_until_completion() {
 #[should_panic(expected = "duplicate vote")]
 fn test_split_vote_duplicate_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, _second) =
         two_arbiter_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, 2);
     client.set_split_voting_enabled(&company, &eng_id, &true);
@@ -12648,7 +12648,7 @@ fn test_split_vote_duplicate_panics() {
 #[test]
 fn test_split_vote_weighted_panel_counts_each_vote_with_its_weight() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let light = Address::generate(&env);
     let other = Address::generate(&env);
@@ -12687,7 +12687,7 @@ fn test_split_vote_weighted_panel_counts_each_vote_with_its_weight() {
 #[test]
 fn test_split_vote_heavy_arbiter_alone_meets_weighted_quorum() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let light = Address::generate(&env);
 
@@ -12719,7 +12719,7 @@ fn test_split_vote_heavy_arbiter_alone_meets_weighted_quorum() {
 #[test]
 fn test_split_vote_fees_apply_to_recruiter_share_only() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let treasury = Address::generate(&env);
 
@@ -12753,7 +12753,7 @@ fn test_split_vote_fees_apply_to_recruiter_share_only() {
 #[test]
 fn test_dispute_window_company_proposes_recruiter_accepts() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-1");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-1");
 
@@ -12779,7 +12779,7 @@ fn test_dispute_window_company_proposes_recruiter_accepts() {
 #[test]
 fn test_dispute_window_recruiter_proposes_company_accepts() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-2");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-2");
 
@@ -12796,7 +12796,7 @@ fn test_dispute_window_recruiter_proposes_company_accepts() {
 #[should_panic(expected = "unauthorized")]
 fn test_dispute_window_company_cannot_accept_own_proposal() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-SELF-C");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-SELF-C");
 
@@ -12808,7 +12808,7 @@ fn test_dispute_window_company_cannot_accept_own_proposal() {
 #[should_panic(expected = "unauthorized")]
 fn test_dispute_window_recruiter_cannot_accept_own_proposal() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-SELF-R");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-SELF-R");
 
@@ -12820,7 +12820,7 @@ fn test_dispute_window_recruiter_cannot_accept_own_proposal() {
 #[should_panic(expected = "unauthorized")]
 fn test_dispute_window_third_party_cannot_propose() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-3P");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-3P");
 
@@ -12831,7 +12831,7 @@ fn test_dispute_window_third_party_cannot_propose() {
 #[should_panic(expected = "unauthorized")]
 fn test_dispute_window_third_party_cannot_accept() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-3A");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-3A");
 
@@ -12843,7 +12843,7 @@ fn test_dispute_window_third_party_cannot_accept() {
 #[should_panic(expected = "InvalidDisputeWindow")]
 fn test_dispute_window_zero_ledgers_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-ZERO");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-ZERO");
 
@@ -12854,7 +12854,7 @@ fn test_dispute_window_zero_ledgers_rejected() {
 #[should_panic(expected = "DisputeWindowProposalPending")]
 fn test_dispute_window_second_proposal_while_pending_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-PEND");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-PEND");
 
@@ -12865,7 +12865,7 @@ fn test_dispute_window_second_proposal_while_pending_rejected() {
 #[test]
 fn test_dispute_window_accept_on_last_ledger_of_ttl_succeeds() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-EDGE");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-EDGE");
 
@@ -12879,7 +12879,7 @@ fn test_dispute_window_accept_on_last_ledger_of_ttl_succeeds() {
 #[should_panic(expected = "NoPendingDisputeWindowProposal")]
 fn test_dispute_window_accept_after_ttl_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-TTL");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-TTL");
 
@@ -12892,7 +12892,7 @@ fn test_dispute_window_accept_after_ttl_panics() {
 #[test]
 fn test_dispute_window_rejection_clears_proposal() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-REJ");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-REJ");
 
@@ -12911,7 +12911,7 @@ fn test_dispute_window_rejection_clears_proposal() {
 #[should_panic(expected = "NoPendingDisputeWindowProposal")]
 fn test_dispute_window_accept_after_rejection_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-REJ2");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-REJ2");
 
@@ -12923,7 +12923,7 @@ fn test_dispute_window_accept_after_rejection_panics() {
 #[test]
 fn test_engagement_dispute_window_tracks_global_without_override() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let plain = String::from_str(&env, "DW-PLAIN");
     let custom = String::from_str(&env, "DW-CUSTOM");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-PLAIN");
@@ -12940,7 +12940,7 @@ fn test_engagement_dispute_window_tracks_global_without_override() {
 #[test]
 fn test_raise_dispute_allowed_on_overridden_window_boundary() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-BOUND");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-BOUND");
 
@@ -12957,7 +12957,7 @@ fn test_raise_dispute_allowed_on_overridden_window_boundary() {
 #[should_panic(expected = "DisputeWindowClosed")]
 fn test_raise_dispute_rejected_past_shortened_window() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-SHORT");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-SHORT");
 
@@ -12973,7 +12973,7 @@ fn test_raise_dispute_rejected_past_shortened_window() {
 #[test]
 fn test_raise_dispute_allowed_past_global_within_extended_window() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = String::from_str(&env, "DW-LONG");
     create_standard_engagement(&env, &client, &token_id, &company, &recruiter, &arbiter, "DW-LONG");
 
@@ -12998,7 +12998,7 @@ const _: () = assert!(VOTE_DEADLINE + 1 < DEFAULT_DISPUTE_WINDOW_LEDGERS);
 /// a vote deadline of `VOTE_DEADLINE` ledgers configured.
 fn vote_deadline_dispute(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -13032,7 +13032,7 @@ fn vote_deadline_dispute(
 #[test]
 fn test_vote_deadline_defaults_to_disabled_and_is_admin_settable() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     assert_eq!(client.get_arbiter_vote_deadline(), 0);
     client.set_arbiter_vote_deadline(&company, &500);
     assert!(has_event(&env, "arbiter_vote_deadline_set"));
@@ -13045,7 +13045,7 @@ fn test_vote_deadline_defaults_to_disabled_and_is_admin_settable() {
 #[should_panic(expected = "unauthorized")]
 fn test_non_admin_cannot_set_vote_deadline() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_arbiter_vote_deadline(&recruiter, &500);
 }
 
@@ -13053,7 +13053,7 @@ fn test_non_admin_cannot_set_vote_deadline() {
 #[should_panic(expected = "VoteDeadlineDisabled")]
 fn test_enforce_vote_deadline_panics_when_disabled() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, ..) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-OFF", false,
     );
@@ -13066,7 +13066,7 @@ fn test_enforce_vote_deadline_panics_when_disabled() {
 #[should_panic(expected = "VoteDeadlineNotReached")]
 fn test_enforce_vote_deadline_panics_before_deadline() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, ..) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-EARLY", false,
     );
@@ -13078,7 +13078,7 @@ fn test_enforce_vote_deadline_panics_before_deadline() {
 #[test]
 fn test_enforce_vote_deadline_recuses_non_voters_and_settles_approve() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, a1, a2, a3) = vote_deadline_dispute(
         &env,
         &client,
@@ -13126,7 +13126,7 @@ fn test_enforce_vote_deadline_recuses_non_voters_and_settles_approve() {
 #[test]
 fn test_enforce_vote_deadline_settles_reject_on_recomputed_quorum() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, a1, ..) = vote_deadline_dispute(
         &env,
         &client,
@@ -13157,7 +13157,7 @@ fn test_enforce_vote_deadline_settles_reject_on_recomputed_quorum() {
 #[test]
 fn test_enforce_vote_deadline_with_split_votes_settles_at_median() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, a1, ..) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-SPLIT", true,
     );
@@ -13182,7 +13182,7 @@ fn test_enforce_vote_deadline_with_split_votes_settles_at_median() {
 #[test]
 fn test_enforce_vote_deadline_without_votes_makes_dispute_escalatable() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, a1, a2, a3) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-ESC", false,
     );
@@ -13221,7 +13221,7 @@ fn test_enforce_vote_deadline_without_votes_makes_dispute_escalatable() {
 #[should_panic(expected = "ArbiterRecused")]
 fn test_arbiter_recused_by_deadline_cannot_vote() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, a1, ..) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-LATE", false,
     );
@@ -13234,7 +13234,7 @@ fn test_arbiter_recused_by_deadline_cannot_vote() {
 #[should_panic(expected = "ArbiterRecused")]
 fn test_recused_arbiter_cannot_split_vote() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, a1, ..) = vote_deadline_dispute(
         &env,
         &client,
@@ -13253,7 +13253,7 @@ fn test_recused_arbiter_cannot_split_vote() {
 #[should_panic(expected = "NoPendingVoters")]
 fn test_enforce_vote_deadline_twice_panics() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (eng_id, ..) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-TWICE", false,
     );
@@ -13265,7 +13265,7 @@ fn test_enforce_vote_deadline_twice_panics() {
 #[test]
 fn test_missed_vote_deadline_lowers_selection_weight() {
     let (env, contract_id, token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let (first, a1, a2, a3) = vote_deadline_dispute(
         &env, &client, &token_id, &company, &recruiter, "VD-W1", false,
     );
@@ -13309,7 +13309,7 @@ fn test_missed_vote_deadline_lowers_selection_weight() {
 #[test]
 fn test_get_config_change_ttl_default() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_config_change_ttl(), 17_280u32);
 }
@@ -13318,7 +13318,7 @@ fn test_get_config_change_ttl_default() {
 #[test]
 fn test_set_config_change_ttl() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_config_change_ttl(&company, &50_000u32);
     assert_eq!(client.get_config_change_ttl(), 50_000u32);
@@ -13329,7 +13329,7 @@ fn test_set_config_change_ttl() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_config_change_ttl_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_config_change_ttl(&recruiter, &50_000u32);
 }
@@ -13338,7 +13338,7 @@ fn test_set_config_change_ttl_non_admin_rejected() {
 #[test]
 fn test_propose_config_change() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     assert_eq!(change_id, 1u64);
@@ -13357,7 +13357,7 @@ fn test_propose_config_change() {
 #[should_panic(expected = "unauthorized")]
 fn test_propose_config_change_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.propose_config_change(&recruiter);
 }
@@ -13366,7 +13366,7 @@ fn test_propose_config_change_non_admin_rejected() {
 #[test]
 fn test_accept_config_change() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     client.accept_config_change(&company, &change_id);
@@ -13381,7 +13381,7 @@ fn test_accept_config_change() {
 #[should_panic(expected = "ConfigChangeExpired")]
 fn test_accept_config_change_expired_panics() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set a short TTL
     client.set_config_change_ttl(&company, &10u32);
@@ -13398,7 +13398,7 @@ fn test_accept_config_change_expired_panics() {
 #[test]
 fn test_accept_config_change_expired_emits_event() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     // Set a short TTL
     client.set_config_change_ttl(&company, &10u32);
@@ -13421,7 +13421,7 @@ fn test_accept_config_change_expired_emits_event() {
 #[should_panic(expected = "unauthorized")]
 fn test_accept_config_change_non_admin_rejected() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     client.accept_config_change(&recruiter, &change_id);
@@ -13431,7 +13431,7 @@ fn test_accept_config_change_non_admin_rejected() {
 #[test]
 fn test_cancel_config_change() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     client.cancel_config_change(&company, &change_id);
@@ -13447,7 +13447,7 @@ fn test_cancel_config_change() {
 #[should_panic(expected = "unauthorized")]
 fn test_cancel_config_change_non_admin_rejected() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     client.cancel_config_change(&recruiter, &change_id);
@@ -13458,7 +13458,7 @@ fn test_cancel_config_change_non_admin_rejected() {
 #[should_panic(expected = "ConfigChangeCancelled")]
 fn test_accept_config_change_cancelled_panics() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     client.cancel_config_change(&company, &change_id);
@@ -13471,7 +13471,7 @@ fn test_accept_config_change_cancelled_panics() {
 #[test]
 fn test_accept_config_change_cancelled_emits_event() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let change_id = client.propose_config_change(&company);
     client.cancel_config_change(&company, &change_id);
@@ -13490,7 +13490,7 @@ fn test_accept_config_change_cancelled_emits_event() {
 #[test]
 fn test_config_change_id_auto_increment() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let id1 = client.propose_config_change(&company);
     let id2 = client.propose_config_change(&company);
@@ -13509,7 +13509,7 @@ fn test_config_change_id_auto_increment() {
 /// and escalate it once the dispute window has elapsed.
 fn escalate_standard_dispute(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -13530,7 +13530,7 @@ fn escalate_standard_dispute(
 #[should_panic(expected = "InvalidSuperArbiterPanel")]
 fn test_set_super_arbiter_panel_quorum_zero_panics() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter_panel(&company, &vec![&env, company.clone()], &0);
 }
@@ -13540,7 +13540,7 @@ fn test_set_super_arbiter_panel_quorum_zero_panics() {
 #[should_panic(expected = "InvalidSuperArbiterPanel")]
 fn test_set_super_arbiter_panel_quorum_exceeds_members_panics() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter_panel(&company, &vec![&env, company.clone(), recruiter.clone()], &3);
 }
@@ -13550,7 +13550,7 @@ fn test_set_super_arbiter_panel_quorum_exceeds_members_panics() {
 #[should_panic(expected = "InvalidSuperArbiterPanel")]
 fn test_set_super_arbiter_panel_duplicate_members_panics() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter_panel(&company, &vec![&env, company.clone(), company.clone()], &1);
 }
@@ -13559,7 +13559,7 @@ fn test_set_super_arbiter_panel_duplicate_members_panics() {
 #[test]
 fn test_set_super_arbiter_panel_clears_single_super_arbiter() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter(&company, &Address::generate(&env));
     let members = vec![&env, recruiter.clone()];
@@ -13573,7 +13573,7 @@ fn test_set_super_arbiter_panel_clears_single_super_arbiter() {
 #[test]
 fn test_set_super_arbiter_clears_panel() {
     let (env, contract_id, _token_id, company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter_panel(&company, &vec![&env, recruiter.clone()], &1);
     let super_arbiter = Address::generate(&env);
@@ -13588,7 +13588,7 @@ fn test_set_super_arbiter_clears_panel() {
 #[should_panic(expected = "unauthorized")]
 fn test_set_super_arbiter_panel_non_admin_rejected() {
     let (env, contract_id, _token_id, _company, recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter_panel(&recruiter, &vec![&env, recruiter.clone()], &1);
 }
@@ -13597,7 +13597,7 @@ fn test_set_super_arbiter_panel_non_admin_rejected() {
 #[test]
 fn test_panel_vote_escalated_dispute_resolution() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let p1 = Address::generate(&env);
     let p2 = Address::generate(&env);
@@ -13622,7 +13622,7 @@ fn test_panel_vote_escalated_dispute_resolution() {
 #[should_panic(expected = "unauthorized")]
 fn test_panel_vote_non_member_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     client.set_super_arbiter_panel(&company, &vec![&env, Address::generate(&env)], &1);
     let eng_id = escalate_standard_dispute(
@@ -13637,7 +13637,7 @@ fn test_panel_vote_non_member_rejected() {
 #[should_panic(expected = "AlreadyVoted")]
 fn test_panel_vote_double_vote_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let p1 = Address::generate(&env);
     let p2 = Address::generate(&env);
@@ -13654,7 +13654,7 @@ fn test_panel_vote_double_vote_panics() {
 #[test]
 fn test_panel_vote_rejection_threshold() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let p1 = Address::generate(&env);
     let p2 = Address::generate(&env);
@@ -13676,7 +13676,7 @@ fn test_panel_vote_rejection_threshold() {
 #[test]
 fn test_get_super_arbiter_resolutions_increments() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     assert_eq!(client.get_super_arbiter_resolutions(), 0u64);
 
@@ -13698,7 +13698,7 @@ fn test_get_super_arbiter_resolutions_increments() {
 #[test]
 fn test_single_super_arbiter_still_works() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
 
     let super_arbiter = Address::generate(&env);
     client.set_super_arbiter(&company, &super_arbiter);
@@ -13719,7 +13719,7 @@ fn test_single_super_arbiter_still_works() {
 /// engagement referred by it. Returns `(treasury, referrer)`.
 fn setup_referred_engagement(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -13739,7 +13739,7 @@ fn setup_referred_engagement(
 #[test]
 fn test_referrer_fee_share_zero_is_noop() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (treasury, referrer) = setup_referred_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-REF-0",
@@ -13756,7 +13756,7 @@ fn test_referrer_fee_share_zero_is_noop() {
 #[test]
 fn test_referrer_fee_share_splits_collected_fee() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (treasury, referrer) = setup_referred_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-REF-SPLIT",
@@ -13777,7 +13777,7 @@ fn test_referrer_fee_share_splits_collected_fee() {
 #[test]
 fn test_removed_referrer_receives_no_fee_share() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let (treasury, referrer) = setup_referred_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-REF-RM",
@@ -13795,7 +13795,7 @@ fn test_removed_referrer_receives_no_fee_share() {
 #[should_panic(expected = "InvalidReferrerFeeShareBps")]
 fn test_referrer_fee_share_rejects_over_full() {
     let (env, contract_id, _token_id, company, _recruiter, _arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     client.set_referrer_fee_share_bps(&company, &10_001);
 }
 
@@ -13806,7 +13806,7 @@ fn test_referrer_fee_share_rejects_over_full() {
 #[test]
 fn test_recruiter_payout_destination_receives_payout() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-DEST", default_config(),
@@ -13824,7 +13824,7 @@ fn test_recruiter_payout_destination_receives_payout() {
 #[test]
 fn test_clearing_recruiter_payout_destination_pays_recruiter() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-DEST-CLR", default_config(),
@@ -13843,7 +13843,7 @@ fn test_clearing_recruiter_payout_destination_pays_recruiter() {
 #[test]
 fn test_recruiter_transfer_does_not_carry_payout_destination() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-DEST-XFER", default_config(),
@@ -13868,7 +13868,7 @@ fn test_recruiter_transfer_does_not_carry_payout_destination() {
 #[test]
 fn test_partial_confirmation_releases_and_refunds_exactly() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PARTIAL", default_config(),
@@ -13894,7 +13894,7 @@ fn test_partial_confirmation_releases_and_refunds_exactly() {
 #[test]
 fn test_rejected_partial_confirmation_leaves_proof_submitted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PARTIAL-REJ", default_config(),
     );
@@ -13912,7 +13912,7 @@ fn test_rejected_partial_confirmation_leaves_proof_submitted() {
 #[should_panic(expected = "milestone proof not yet submitted")]
 fn test_partial_confirmation_requires_proof_submitted() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PARTIAL-PEND", default_config(),
     );
@@ -13924,7 +13924,7 @@ fn test_partial_confirmation_requires_proof_submitted() {
 #[should_panic(expected = "PartialConfirmationExpired")]
 fn test_partial_confirmation_expires_after_amendment_ttl() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-PARTIAL-TTL", default_config(),
     );
@@ -13943,7 +13943,7 @@ fn test_partial_confirmation_expires_after_amendment_ttl() {
 #[test]
 fn test_dispute_settlement_splits_without_arbiter_fee() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     client.set_arbiter_fee(&company, &100u32);
     create_single_milestone_engagement(
@@ -13969,7 +13969,7 @@ fn test_dispute_settlement_splits_without_arbiter_fee() {
 #[should_panic(expected = "no pending dispute settlement")]
 fn test_dispute_settlement_invalidated_by_vote_resolution() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-SETTLE-VOTE", default_config(),
     );
@@ -13990,7 +13990,7 @@ fn test_dispute_settlement_invalidated_by_vote_resolution() {
 #[should_panic(expected = "unauthorized")]
 fn test_dispute_settlement_cannot_be_accepted_by_proposer_side() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     create_single_milestone_engagement(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-SETTLE-SELF", default_config(),
     );
@@ -14010,7 +14010,7 @@ fn test_dispute_settlement_cannot_be_accepted_by_proposer_side() {
 /// a custom config.
 fn create_standard_engagement_with_config(
     env: &Env,
-    client: &HireSettleContractClient,
+    client: &StellarSorterContractClient,
     token_id: &Address,
     company: &Address,
     recruiter: &Address,
@@ -14042,7 +14042,7 @@ fn create_standard_engagement_with_config(
 #[test]
 fn test_close_engagement_at_end_pays_submitted_and_refunds_rest() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let mut cfg = default_config();
     cfg.end_ledger = Some(2_000_000);
@@ -14070,7 +14070,7 @@ fn test_close_engagement_at_end_pays_submitted_and_refunds_rest() {
 #[should_panic(expected = "EndLedgerNotReached")]
 fn test_close_engagement_at_end_before_deadline_panics() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let mut cfg = default_config();
     cfg.end_ledger = Some(2_000_000);
     let eng_id = create_standard_engagement_with_config(
@@ -14084,7 +14084,7 @@ fn test_close_engagement_at_end_before_deadline_panics() {
 #[should_panic(expected = "InvalidEndLedger")]
 fn test_end_ledger_before_retention_unlock_rejected() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let mut cfg = default_config();
     cfg.end_ledger = Some(100 + 31 * 17_280);
     create_standard_engagement_with_config(
@@ -14096,7 +14096,7 @@ fn test_end_ledger_before_retention_unlock_rejected() {
 #[test]
 fn test_emergency_exit_refunds_company_after_escape_delay() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let token_client = token::Client::new(&env, &token_id);
     let eng_id = create_standard_engagement_with_config(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-ESCAPE", default_config(),
@@ -14119,7 +14119,7 @@ fn test_emergency_exit_refunds_company_after_escape_delay() {
 #[should_panic(expected = "EscapeNotReady")]
 fn test_emergency_exit_timer_resets_on_unpause() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_standard_engagement_with_config(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-ESCAPE-RESET", default_config(),
     );
@@ -14138,7 +14138,7 @@ fn test_emergency_exit_timer_resets_on_unpause() {
 #[test]
 fn test_company_confirmer_member_can_confirm_until_removed() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let member = Address::generate(&env);
     let eng_id = create_standard_engagement_with_config(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-TEAM", default_config(),
@@ -14162,7 +14162,7 @@ fn test_company_confirmer_member_can_confirm_until_removed() {
 #[should_panic(expected = "unauthorized")]
 fn test_company_disputer_member_cannot_confirm() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let member = Address::generate(&env);
     let eng_id = create_standard_engagement_with_config(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-TEAM-D", default_config(),
@@ -14179,7 +14179,7 @@ fn test_company_disputer_member_cannot_confirm() {
 #[test]
 fn test_function_pause_blocks_only_that_entry_point() {
     let (env, contract_id, token_id, company, recruiter, arbiter) = setup();
-    let client = HireSettleContractClient::new(&env, &contract_id);
+    let client = StellarSorterContractClient::new(&env, &contract_id);
     let eng_id = create_standard_engagement_with_config(
         &env, &client, &token_id, &company, &recruiter, &arbiter, "ENG-FNP", default_config(),
     );
