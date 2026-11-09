@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run tests
-      run: cargo test --manifest-path contracts/hiresettle/Cargo.toml
+      run: cargo test --manifest-path contracts/stellarsorter/Cargo.toml
