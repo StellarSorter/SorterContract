@@ -17,7 +17,7 @@ use soroban_sdk::{contractimpl, Address, Env, String, Symbol, Vec};
 use crate::*;
 
 #[contractimpl]
-impl HireSettleContract {
+impl StellarSorterContract {
     // ----------------------------------------------------------
     // ISSUE #467 — ARBITER POOL
     // ----------------------------------------------------------
